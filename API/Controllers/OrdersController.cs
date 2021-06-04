@@ -8,6 +8,10 @@ using Core.Entities.OrderAggregate;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Infrastructure.Data;
+using System;
+using Neo4j.Driver;
+using Neo4jClient;
 
 namespace API.Controllers
 {
@@ -16,10 +20,12 @@ namespace API.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IMapper _mapper;
-        public OrdersController(IOrderService orderService, IMapper mapper)
+        private readonly IGraphClient _neo4JService;
+        public OrdersController(IOrderService orderService, IMapper mapper, IGraphClient neo4JService)
         {
             _mapper = mapper;
             _orderService = orderService;
+            _neo4JService = neo4JService;
         }
         [HttpPost]
         public async Task<ActionResult<Order>> CreateOrder(OrderDto orderDto)
@@ -54,5 +60,7 @@ namespace API.Controllers
         {
             return Ok(await _orderService.GetDeliveryMethodsAsync());
         }
+
+
     }
 }

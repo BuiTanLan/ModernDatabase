@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,24 +9,37 @@ using AutoMapper;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications;
+using Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Neo4jClient;
+
 
 namespace API.Controllers
 {
+    public class SinhVien {
+        public int MaSo { get; set; }
+        public string HoTen { get; set; }
+        public string Caption { get; set; }
+        public string Sex { get; set; }  
+    }
 
     public class ProductsController : BaseApiController
     {
         private readonly IPhotoService _photoService;
+        private readonly IGraphClient _neo4JService;
 
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        public ProductsController(IUnitOfWork unitOfWork, IMapper mapper, IPhotoService photoService)
+        private readonly IProductService _productService;
+        public ProductsController(IUnitOfWork unitOfWork, IMapper mapper, IPhotoService photoService, IProductService productService, IGraphClient neo4JService)
         {
             _photoService = photoService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _productService = productService;
+            _neo4JService = neo4JService;
         }
 
 
@@ -36,8 +50,11 @@ namespace API.Controllers
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(productParams);
             var countSpec = new ProductWithFiltersForCountSpecification(productParams);
-            var totalItems = await _unitOfWork.Repository<Product>().CountAsync(countSpec);
-            var products = await _unitOfWork.Repository<Product>().ListAsync(spec);
+            //var totalItems = await _unitOfWork.Repository<Product>().CountAsync(countSpec);
+            var totalItems = await _productService.CountAsync(countSpec);
+            //var products = await _unitOfWork.Repository<Product>().ListAsync(spec);
+            var products = await _productService.ListAsync(spec);
+
             var data = _mapper
                 .Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDto>>(products);
             return Ok(new Pagination<ProductToReturnDto>(productParams.PageIndex,
@@ -49,10 +66,12 @@ namespace API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ProductToReturnDto>> GetProduct(int id)
+        public async Task<ActionResult<ProductToReturnDto>> GetProduct(string id)
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
-            var product = await _unitOfWork.Repository<Product>().GetEntityWithSpec(spec);
+            //var product = await _unitOfWork.Repository<Product>().GetEntityWithSpec(spec);
+            var product = await _productService.GetEntityWithSpec(spec);
+
             if (product == null) return NotFound(new ApiResponse(404));
             return _mapper.Map<Product, ProductToReturnDto>(product);
         }
@@ -62,7 +81,8 @@ namespace API.Controllers
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
         {
-            return Ok(await _unitOfWork.Repository<ProductBrand>().ListAllAsync());
+            //return Ok(await _unitOfWork.Repository<ProductBrand>().ListAllAsync());
+            return Ok(await _productService.GetProductBrandsAsync());
         }
 
 
@@ -70,7 +90,7 @@ namespace API.Controllers
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<ProductType>>> GetProductTypes()
         {
-            return Ok(await _unitOfWork.Repository<ProductType>().ListAllAsync());
+            return Ok(await _productService.GetProductTypesAsync());
         }
 
 
@@ -79,11 +99,15 @@ namespace API.Controllers
         public async Task<ActionResult<Product>> CreateProduct(ProductCreateDto productToCreate)
         {
             var product = _mapper.Map<ProductCreateDto, Product>(productToCreate);
-
-            _unitOfWork.Repository<Product>().Add(product);
-            var result = await _unitOfWork.Complete();
-
-            if (result <= 0) return BadRequest(new ApiResponse(400, "Problem creating product"));
+            try
+            {
+                await _productService.Add(product);
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ApiResponse(400, "Problem creating product"));
+            }
+            //var result = await _unitOfWork.Complete();
 
             return Ok(product);
         }
@@ -91,26 +115,31 @@ namespace API.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Product>> UpdateProduct(int id, ProductCreateDto productToUpdate)
+        public async Task<ActionResult<Product>> UpdateProduct(string id, ProductCreateDto productToUpdate)
         {
-            var product = await _unitOfWork.Repository<Product>().GetByIdAsync(id);
+            var product = await _productService.GetByIdAsync(id);
 
             _mapper.Map(productToUpdate, product);
+            try
+            {
+                await _productService.Update(product);
+            }
+            catch(Exception)
+            {
+                return BadRequest(new ApiResponse(400, "Problem updating product"));
+            }
+            //var result = await _unitOfWork.Complete();
 
-            _unitOfWork.Repository<Product>().Update(product);
-            var result = await _unitOfWork.Complete();
-
-            if (result <= 0) return BadRequest(new ApiResponse(400, "Problem updating product"));
-
+            //if (result <= 0) 
             return Ok(product);
         }
 
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Product>> DeleteProduct(int id)
+        public async Task<ActionResult<Product>> DeleteProduct(string id)
         {
-            var product = await _unitOfWork.Repository<Product>().GetByIdAsync(id);
+            var product = await _productService.GetByIdAsync(id);
             foreach (var photo in product.Photos)
             {
                 if (photo.Id > 18)
@@ -119,21 +148,24 @@ namespace API.Controllers
                 }
             }
 
-            _unitOfWork.Repository<Product>().Delete(product);
-            var result = await _unitOfWork.Complete();
-
-            if (result <= 0) return BadRequest(new ApiResponse(400, "Problem deleting product"));
-
+            try
+            {
+                await _productService.Delete(product);
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ApiResponse(400, "Problem deleting product"));
+            }
             return Ok(product);
         }
 
 
         [HttpPut("{id}/photo")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<ProductToReturnDto>> AddProductPhoto(int id, [FromForm] ProductPhotoDto photoDto)
+        public async Task<ActionResult<ProductToReturnDto>> AddProductPhoto(string id, [FromForm] ProductPhotoDto photoDto)
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
-            var product = await _unitOfWork.Repository<Product>().GetEntityWithSpec(spec);
+            var product = await _productService.GetEntityWithSpec(spec);
 
             if (photoDto.Photo.Length > 0)
             {
@@ -142,12 +174,14 @@ namespace API.Controllers
                 if (photo != null)
                 {
                     product.AddPhoto(photo.PictureUrl, photo.FileName);
-
-                    _unitOfWork.Repository<Product>().Update(product);
-
-                    var result = await _unitOfWork.Complete();
-
-                    if (result <= 0) return BadRequest(new ApiResponse(400, "Problem adding photo product"));
+                    try
+                    {
+                        await _productService.Update(product);
+                    }
+                    catch (Exception)
+                    {
+                        return BadRequest(new ApiResponse(400, "Problem adding photo product"));
+                    }
                 }
                 else
                 {
@@ -161,10 +195,10 @@ namespace API.Controllers
 
         [HttpDelete("{id}/photo/{photoId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> DeleteProductPhoto(int id, int photoId)
+        public async Task<ActionResult> DeleteProductPhoto(string id, int photoId)
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
-            var product = await _unitOfWork.Repository<Product>().GetEntityWithSpec(spec);
+            var product = await _productService.GetEntityWithSpec(spec);
 
             var photo = product.Photos.SingleOrDefault(x => x.Id == photoId);
 
@@ -183,12 +217,14 @@ namespace API.Controllers
 
             product.RemovePhoto(photoId);
 
-            _unitOfWork.Repository<Product>().Update(product);
-
-            var result = await _unitOfWork.Complete();
-
-            if (result <= 0) return BadRequest(new ApiResponse(400, "Problem adding photo product"));
-
+            try
+            {
+                await _productService.Update(product);
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ApiResponse(400, "Problem deleting photo product"));
+            }
             return Ok();
         }
 
@@ -196,22 +232,47 @@ namespace API.Controllers
 
         [HttpPost("{id}/photo/{photoId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<ProductToReturnDto>> SetMainPhoto(int id, int photoId)
+        public async Task<ActionResult<ProductToReturnDto>> SetMainPhoto(string id, int photoId)
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
-            var product = await _unitOfWork.Repository<Product>().GetEntityWithSpec(spec);
+            var product = await _productService.GetEntityWithSpec(spec);
 
             if (product.Photos.All(x => x.Id != photoId)) return NotFound();
 
             product.SetMainPhoto(photoId);
 
-            _unitOfWork.Repository<Product>().Update(product);
 
-            var result = await _unitOfWork.Complete();
-
-            if (result <= 0) return BadRequest(new ApiResponse(400, "Problem adding photo product"));
-
+            try
+            {
+                await _productService.Update(product);
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ApiResponse(400, "Problem setting photo as main"));
+            }
             return _mapper.Map<Product, ProductToReturnDto>(product);
+        }
+
+
+        [HttpPost("exec/{command}")]
+        public async Task<IActionResult> Exec(string command)
+        {
+            try
+            {
+                await _neo4JService.ConnectAsync();
+                if (!_neo4JService.IsConnected)
+                    return new BadRequestObjectResult("Not connected");
+
+
+                var result = await _neo4JService.Cypher.Match("(sv:SINHVIEN)").Return(sv => sv.As<SinhVien>()).ResultsAsync;
+                
+
+                return Ok(result.ToList());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
         }
     }
 }

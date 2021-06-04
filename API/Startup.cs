@@ -20,6 +20,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Neo4j.Driver;
+using Neo4jClient;
 using StackExchange.Redis;
 
 namespace API
@@ -47,11 +49,24 @@ namespace API
             {
                 opt.UseSqlServer(_config.GetConnectionString("DefaultConnection"));
             });
+            services.Configure<AppSettings>(_config.GetSection("AppSettings"));
+
             services.AddSingleton<IConnectionMultiplexer>(c =>
             {
                 var configuration = ConfigurationOptions.Parse(_config.GetConnectionString("Redis"), true);
                 return ConnectionMultiplexer.Connect(configuration);
             });
+
+            services.AddSingleton<MongoDbService>();
+
+
+            // add neo4j
+            var info = _config.GetSection("Neo4j");
+            //var neo4jClient = GraphDatabase.Driver(new Uri(info["Neo4jServer"]), info["Neo4jUserName"], info["Neo4jPassword"]);
+            var driver = GraphDatabase.Driver(info["Neo4jServer"], AuthTokens.Basic(info["Neo4jUserName"], info["Neo4jPassword"]));
+            var neo4jClient = new BoltGraphClient(driver);
+            services.AddSingleton<IGraphClient>(neo4jClient);
+
             services.AddApplicationServices();
             services.AddIdentityServices(_config);
             services.AddSwaggerDocumentation();

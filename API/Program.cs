@@ -27,7 +27,8 @@ namespace API
             {
                 var context = services.GetRequiredService<StoreContext>();
                 await context.Database.MigrateAsync();
-                await StoreContextSeed.SeedAsync(context, loggerFactory);
+
+                //await StoreContextSeed.SeedAsync(context, loggerFactory);
                 // This method gets called by the runtime. Use this method to
                 var userManager = services.GetRequiredService<UserManager<AppUser>>();
                 var roleManager = services.GetRequiredService<RoleManager<AppRole>>();

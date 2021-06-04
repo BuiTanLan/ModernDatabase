@@ -5,16 +5,20 @@ namespace Core.Specifications
     public class ProductsWithTypesAndBrandsSpecification : BaseSpecification<Product>
     {
         public ProductsWithTypesAndBrandsSpecification(ProductSpecParams productParams)
-            : base(x =>
-                (string.IsNullOrEmpty(productParams.Search) || x.Name.ToLower().Contains
-                (productParams.Search)) &&
-                (productParams.BrandName == "all" || x.ProductBrand.Name.ToLower() == productParams.BrandName) &&
-                (productParams.TypeName == "all" || x.ProductType.Name.ToLower() == productParams.TypeName))
+            : base(null)
         {
-            AddIncluded(x => x.ProductType);
-            AddIncluded(x => x.ProductBrand);
-            AddIncluded(x => x.Photos);
-
+            if (!string.IsNullOrEmpty(productParams.Search))
+            {
+                SetCriteria(x =>
+                    (string.IsNullOrEmpty(productParams.Search) || x.Name.ToLower().Contains
+                    (productParams.Search)) &&
+                    (productParams.BrandName == "all" || x.ProductBrand.Name.ToLower() == productParams.BrandName) &&
+                    (productParams.TypeName == "all" || x.ProductType.Name.ToLower() == productParams.TypeName));
+            }
+            //AddIncluded(x => x.ProductType);
+            //AddIncluded(x => x.ProductBrand);
+            //AddIncluded(x => x.Photos);
+            
             AddOrderBy(x => x.Name);
             ApplyPaging(productParams.PageSize * (productParams.PageIndex - 1), productParams.PageSize); 
             if (!string.IsNullOrEmpty(productParams.Sort))
@@ -33,12 +37,11 @@ namespace Core.Specifications
                 }
             }
         }
-        public ProductsWithTypesAndBrandsSpecification(int id) : base(x => x.Id == id)
+        public ProductsWithTypesAndBrandsSpecification(string id) : base(x => x._id == id)
         {
-            AddIncluded(x => x.ProductType);
-            AddIncluded(x => x.ProductBrand);
-            AddIncluded(x => x.Photos);
-
+            //AddIncluded(x => x.ProductType);
+            //AddIncluded(x => x.ProductBrand);
+            //AddIncluded(x => x.Photos);
         }
     }
 }

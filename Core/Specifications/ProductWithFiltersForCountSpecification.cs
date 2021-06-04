@@ -5,13 +5,16 @@ namespace Core.Specifications
     public class ProductWithFiltersForCountSpecification : BaseSpecification<Product>
     {
         public ProductWithFiltersForCountSpecification(ProductSpecParams productParams)
-        : base(x =>
-                (string.IsNullOrEmpty(productParams.Search) || x.Name.ToLower().Contains
-                (productParams.Search)) &&
-                (productParams.BrandName == "all" || x.ProductBrand.Name.ToLower() == productParams.BrandName) &&
-                (productParams.TypeName == "all" || x.ProductType.Name.ToLower() == productParams.TypeName))
+        : base(null)
         {
-
+            if (!string.IsNullOrEmpty(productParams.Search))
+            {
+                SetCriteria(x =>
+                    (string.IsNullOrEmpty(productParams.Search) || x.Name.ToLower().Contains
+                    (productParams.Search)) &&
+                    (productParams.BrandName == "all" || x.ProductBrand.Name.ToLower() == productParams.BrandName) &&
+                    (productParams.TypeName == "all" || x.ProductType.Name.ToLower() == productParams.TypeName));
+            }
         }
     }
 }

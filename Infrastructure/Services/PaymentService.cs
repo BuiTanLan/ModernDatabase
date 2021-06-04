@@ -17,12 +17,14 @@ namespace Infrastructure.Services
         private readonly IConfiguration _config;
         private readonly IBasketRepository _basketRepo;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IProductService _productService;
 
-        public PaymentService(IBasketRepository basketRepo, IUnitOfWork unitOfWork, IConfiguration config)
+        public PaymentService(IBasketRepository basketRepo, IUnitOfWork unitOfWork, IConfiguration config, IProductService productService)
         {
             _unitOfWork = unitOfWork;
             _basketRepo = basketRepo;
             _config = config;
+            _productService = productService;
         }
         public async Task<CustomerBasket> CreateOrUpdatePaymentIntent(string basketId)
         {
@@ -41,7 +43,7 @@ namespace Infrastructure.Services
 
             foreach (var item in basket.Items)
             {
-                var productItem = await _unitOfWork.Repository<Product>()
+                var productItem = await _productService
                     .GetByIdAsync(item.Id);
                 if(item.Price != productItem.Price)
                 {

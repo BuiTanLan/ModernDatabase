@@ -22,6 +22,7 @@ namespace API.Extensions
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
+            services.AddScoped<IProductService, ProductService>();
             services.Configure<IdentityOptions>(opt =>
             {
                // Default Password settings.

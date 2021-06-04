@@ -13,13 +13,15 @@ namespace Infrastructure.Services
         private readonly IBasketRepository _basketRepo;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPaymentService _paymentService;
+        private readonly IProductService _productService;
 
         public OrderService(IBasketRepository basketRepo, IUnitOfWork unitOfWork,
-            IPaymentService paymentService)
+            IPaymentService paymentService, IProductService productService)
         {
             _paymentService = paymentService;
             _unitOfWork = unitOfWork;
             _basketRepo = basketRepo;
+            _productService = productService;
         }
         public async Task<Order> CreateOrderAsync(string buyerEmail, int deliveryMethodId, string basketId, Address shippingAddress)
         {
@@ -31,8 +33,8 @@ namespace Infrastructure.Services
             {
                 int index = item.PictureUrl.IndexOf("images/products/");
                 string pictureUrl = item.PictureUrl.Substring(index);
-                var productItem = await _unitOfWork.Repository<Product>().GetByIdAsync(item.Id);
-                var itemOrdered = new ProductItemOrdered(productItem.Id, productItem.Name, pictureUrl);
+                var productItem = await _productService.GetByIdAsync(item.Id);
+                var itemOrdered = new ProductItemOrdered(productItem._id, productItem.Name, pictureUrl);
                 var orderItem = new OrderItem(itemOrdered, productItem.Price, item.Quantity);
                 items.Add(orderItem);
             }

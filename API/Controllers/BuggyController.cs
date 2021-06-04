@@ -14,7 +14,7 @@ namespace API.Controllers
         [HttpGet("notfound")]
         public ActionResult GetNotFoundRequest()
         {
-            var thing = _context.Products.Find(42);
+            var thing = _context.Orders.Find(10000000);
             if (thing == null)
             {
                 return NotFound(new ApiResponse(404));
@@ -24,7 +24,7 @@ namespace API.Controllers
         [HttpGet("servererror")]
         public ActionResult GetServerError()
         {
-            var thing = _context.Products.Find(42);
+            var thing = _context.Orders.Find(100000000000);
 
             var thingToReturn = thing.ToString();
 

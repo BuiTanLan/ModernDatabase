@@ -1,19 +1,24 @@
 using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Core.Entities
 {
-    public class Product : BaseEntity
+    public class Product : BaseEntityMongo
     {
+        //[BsonId]
+        //[BsonRepresentation(BsonType.ObjectId)]
+        //public string _id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
         //public string PictureUrl { get; set; }
         public ProductType ProductType { get; set; }
-        public int ProductTypeId { get; set; }
+        //public int ProductTypeId { get; set; }
         public ProductBrand ProductBrand { get; set; }
-        public int ProductBrandId { get; set; }
-        private readonly List<Photo> _photos = new List<Photo>();
+        //public int ProductBrandId { get; set; }
+        public List<Photo> _photos { get; set; }
         public IReadOnlyList<Photo> Photos => _photos.AsReadOnly();
 
         public void AddPhoto(string pictureUrl, string fileName, bool isMain = false)

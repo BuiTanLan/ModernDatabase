@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Core.Entities.OrderAggregate;
 using Core.Entities;
 using Core.Specifications;
 
 namespace Core.Interfaces
 {
-    public interface IProductRepository
+    public interface IProductService
     {
         Task<Product> GetProductByIdAsync(string id);
         Task<IReadOnlyList<Product>> GetProductsAsync();
@@ -19,5 +20,6 @@ namespace Core.Interfaces
         Task Add(Product entity);
         Task Update(Product entity);
         Task Delete(Product entity);
+
     }
 }
