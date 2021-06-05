@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using API.Dtos;
 using API.Errors;
 using API.Helpers;
 using AutoMapper;
 using Core.Entities;
+using Core.Entities.OrderAggregate;
 using Core.Interfaces;
 using Core.Specifications;
 using Infrastructure.Data;
@@ -14,29 +16,23 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Neo4jClient;
+using MongoDB.Driver;
+
 
 
 namespace API.Controllers
 {
-    public class SinhVien {
-        public int MaSo { get; set; }
-        public string HoTen { get; set; }
-        public string Caption { get; set; }
-        public string Sex { get; set; }  
-    }
-
     public class ProductsController : BaseApiController
     {
         private readonly IPhotoService _photoService;
         private readonly IGraphClient _neo4JService;
-
         private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IOrderRepository _orderRepository;
         private readonly IProductService _productService;
-        public ProductsController(IUnitOfWork unitOfWork, IMapper mapper, IPhotoService photoService, IProductService productService, IGraphClient neo4JService)
+        public ProductsController(IOrderRepository orderRepository, IMapper mapper, IPhotoService photoService, IProductService productService, IGraphClient neo4JService)
         {
             _photoService = photoService;
-            _unitOfWork = unitOfWork;
+            _orderRepository = orderRepository;
             _mapper = mapper;
             _productService = productService;
             _neo4JService = neo4JService;
@@ -255,24 +251,9 @@ namespace API.Controllers
 
 
         [HttpPost("exec/{command}")]
-        public async Task<IActionResult> Exec(string command)
+        public async Task<IActionResult> Exec([FromBody] Order order)
         {
-            try
-            {
-                await _neo4JService.ConnectAsync();
-                if (!_neo4JService.IsConnected)
-                    return new BadRequestObjectResult("Not connected");
-
-
-                var result = await _neo4JService.Cypher.Match("(sv:SINHVIEN)").Return(sv => sv.As<SinhVien>()).ResultsAsync;
-                
-
-                return Ok(result.ToList());
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
-            }
+            return Ok(await _orderRepository.Add(order));
         }
     }
 }

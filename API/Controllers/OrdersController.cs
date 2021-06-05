@@ -47,7 +47,7 @@ namespace API.Controllers
 
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderToReturnDto>> GetOrderByIdForUser(int id)
+        public async Task<ActionResult<OrderToReturnDto>> GetOrderByIdForUser(string id)
         {
             var email = HttpContext.User.RetrieveEmailFromPrincipal();
             var order = await _orderService.GetOrderByIdAsync(id, email);

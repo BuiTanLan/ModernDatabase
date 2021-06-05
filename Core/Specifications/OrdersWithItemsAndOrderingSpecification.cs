@@ -1,22 +1,23 @@
 using System;
 using System.Linq.Expressions;
 using Core.Entities.OrderAggregate;
+using Core.Entities.OrderNeo4j;
 
 namespace Core.Specifications
 {
-    public class OrdersWithItemsAndOrderingSpecification: BaseSpecification<Order>
+    public class OrdersWithItemsAndOrderingSpecification: BaseSpecification<OrderNeo4j>
     {
         public OrdersWithItemsAndOrderingSpecification(string email ) 
-            : base(o =>o.BuyerEmail == email)
+            : base(ord =>ord.BuyerEmail == email)
         {
-            AddIncluded(o => o.OrderItems);
-            AddIncluded(o => o.DeliveryMethod);
+            //AddIncluded(o => o.OrderItems);
+            //AddIncluded(o => o.DeliveryMethod);
         }
-        public OrdersWithItemsAndOrderingSpecification(int id, string email)
-            : base(o => o.Id == id && o.BuyerEmail ==email)
+        public OrdersWithItemsAndOrderingSpecification(string id, string email)
+            : base(ord => ord.uuid == id && ord.BuyerEmail ==email)
         {
-            AddIncluded(o => o.OrderItems);
-            AddIncluded(o => o.DeliveryMethod);
+            //AddIncluded(o => o.OrderItems);
+            //AddIncluded(o => o.DeliveryMethod);
         }
     }
 }

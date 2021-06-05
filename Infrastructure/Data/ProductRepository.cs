@@ -1,20 +1,25 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Entities;
+using Core.Entities.OrderNeo4j;
 using Core.Interfaces;
 using Core.Specifications;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
+using Neo4jClient;
 
 namespace Infrastructure.Data
 {
     public class ProductRepository: IProductRepository
     {
         private readonly MongoDbService _mongoDbService;
-        public ProductRepository(MongoDbService mongoDbService)
+        private readonly IGraphClient _client;
+        public ProductRepository(MongoDbService mongoDbService, IGraphClient client)
         {
             _mongoDbService = mongoDbService;
+            _client = client;
         }
 
         public async Task<IReadOnlyList<ProductBrand>> GetProductBrandsAsync()
@@ -45,7 +50,33 @@ namespace Infrastructure.Data
 
         public async Task Add(Product entity)
         {
+            await _client.ConnectAsync();
+            if (!_client.IsConnected)
+                return;
+
             await _mongoDbService.Product.InsertOneAsync(entity);
+
+
+            //var result = await _client.Cypher.Merge("(pro:PRODUCT {ProductItemId: id})")
+            //                                 .OnCreate()
+            //                                 .Set("pro = {newProduct}")
+            //                                 .WithParams(new { uuid = entity._id, newProduct = entity })
+            //                                 .Return(pro => pro.As<ProductNeo4j>().uuid)
+            //                                 .ResultsAsync;
+
+            var tempProduct = new ProductNeo4j(entity);
+
+            var result = await _client.Cypher.Create("(pro:PRODUCT)")
+                                             .Set("pro = {newProduct}")
+                                             .WithParams(new { newProduct = tempProduct })
+                                             .Return(pro => pro.As<ProductNeo4j>().uuid)
+                                             .ResultsAsync;
+
+            if (result == null)
+            {
+                var filter = Builders<Product>.Filter.Eq(e => e._id, entity._id);
+                await _mongoDbService.Product.DeleteOneAsync(filter);
+            }
         }
 
         public async Task<int> CountAsync(ISpecification<Product> spec)

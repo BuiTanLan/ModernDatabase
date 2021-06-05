@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -10,23 +11,26 @@ using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Neo4jClient;
 
 namespace API.Controllers
 {
     public class AccountController : BaseApiController
     {
+        private readonly IGraphClient _client;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
 
         public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
-         ITokenService tokenService, IMapper mapper)
+         ITokenService tokenService, IMapper mapper, IGraphClient client)
         {
             _mapper = mapper;
             _tokenService = tokenService;
             _signInManager = signInManager;
             _userManager = userManager;
+            _client = client;
         }
         [Authorize]
         [HttpGet]
@@ -84,6 +88,18 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
+            try
+            {
+                await _client.ConnectAsync();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new ApiResponse(400, ex.ToString()));
+            }
+
+            if (!_client.IsConnected)
+                return BadRequest(new ApiResponse(400, "Not connected to neo4j"));
+
             if (CheckEmailExistsAsync(registerDto.Email).Result.Value)
             {
                 return new BadRequestObjectResult(new ApiValidationErrorResponse
@@ -99,6 +115,7 @@ namespace API.Controllers
             };
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
+
             return new UserDto
             {
                 DisplayName = user.DisplayName,

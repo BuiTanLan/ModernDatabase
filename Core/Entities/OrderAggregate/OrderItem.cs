@@ -1,6 +1,6 @@
 namespace Core.Entities.OrderAggregate
 {
-    public class OrderItem : BaseEntity
+    public class OrderItem : BaseEntityNeo4j
     {
         public OrderItem()
         {

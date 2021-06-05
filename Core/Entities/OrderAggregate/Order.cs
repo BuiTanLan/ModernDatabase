@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Core.Entities.OrderAggregate
 {
-    public class Order : BaseEntity
+    public class Order : BaseEntityNeo4j
     {
         public Order()
         { 
