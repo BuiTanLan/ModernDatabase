@@ -89,7 +89,20 @@ namespace Infrastructure.Data
         public async Task Delete(Product entity)
         {
             var filter = Builders<Product>.Filter.Eq(e => e._id, entity._id);
-            await _mongoDbService.Product.DeleteOneAsync(filter);
+            var delResult = await _mongoDbService.Product.DeleteOneAsync(filter);
+
+            var result = await _client.Cypher.Match("(pro:PRODUCT)")
+                   .Where("pro.ProductItemId = $id")
+                   .Set("pro.IsDeleted = 1")
+                   .WithParams(new { id = entity._id })
+                   .Return(pro => pro.As<ProductNeo4j>().uuid)
+                   .ResultsAsync;
+
+            var temp = result.Single();
+            if (temp == null)
+            {
+                await _mongoDbService.Product.InsertOneAsync(entity);
+            }
         }
 
         public async Task<Product> GetByIdAsync(string _id)
@@ -118,7 +131,24 @@ namespace Infrastructure.Data
         public async Task Update(Product entity)
         {
             var filter = Builders<Product>.Filter.Eq(e => e._id, entity._id);
+            var backupProduct = await _mongoDbService.Product.Find(filter).SingleOrDefaultAsync();
+
             await _mongoDbService.Product.ReplaceOneAsync(filter,entity);
+
+            var updatedProduct = new ProductNeo4j(entity);
+
+            var result = await _client.Cypher.Match("(pro:PRODUCT)")
+                                               .Where("pro.ProductItemId = $id")
+                                               .Set("pro = $product")
+                                               .WithParams(new { id = entity._id, product = updatedProduct })
+                                               .Return(pro => pro.As<ProductNeo4j>().uuid)
+                                               .ResultsAsync;
+
+            var temp = result.Single();
+            if (temp == null)
+            {
+                await _mongoDbService.Product.ReplaceOneAsync(filter, backupProduct);
+            }
         }
 
         private IFindFluent<Product, Product> ApplySpecification(ISpecification<Product> spec)

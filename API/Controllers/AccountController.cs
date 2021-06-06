@@ -7,6 +7,7 @@ using API.Errors;
 using API.Extensions;
 using AutoMapper;
 using Core.Entities.Identity;
+using Core.Entities.OrderNeo4j;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -64,8 +65,29 @@ namespace API.Controllers
         public async Task<ActionResult<AddressDto>> UpdateUserAddress(AddressDto address)
         {
             var user = await _userManager.FindByUserByClaimsPrincipleWithAddressAsync(HttpContext.User);
+            var backUpUser = new AppUser();
+            backUpUser = user;
+
+
             user.Address = _mapper.Map<AddressDto, Address>(address);
             var result = await _userManager.UpdateAsync(user);
+
+            var newAddress = new UserNeo4j(user.Address);
+
+            // update address
+            var neo4jResult = await _client.Cypher.Match("(user:USER)")
+                                          .Where<UserNeo4j>(e => e.BuyerEmail == user.Email)
+                                          .Set("user = $newUSer")
+                                          .Return(user => user.As<UserNeo4j>())
+                                          .ResultsAsync;
+
+            var temp = neo4jResult.Single();
+            if (temp == null)
+            {
+                await _userManager.UpdateAsync(backUpUser);
+                return BadRequest("Problem updating the user in neo4j");
+            }
+
             if(result.Succeeded) return Ok(_mapper.Map<Address, AddressDto>(user.Address));
             return BadRequest("Problem updating the user");
         }
@@ -115,6 +137,20 @@ namespace API.Controllers
             };
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
+
+            //add to graph
+            var newUser = new UserNeo4j(user.Email);
+            var addResult = await _client.Cypher.Create("(user:USER)")
+                                               .Set("user = $newUser")
+                                               .WithParams(new { newUser = newUser })
+                                               .Return(user => user.As<UserNeo4j>().BuyerEmail)
+                                               .ResultsAsync;
+            var temp = addResult.Single();
+            if (temp == null)
+            {
+                await _userManager.DeleteAsync(user);
+                return BadRequest("Problem adding the user to neo4j");
+            }
 
             return new UserDto
             {

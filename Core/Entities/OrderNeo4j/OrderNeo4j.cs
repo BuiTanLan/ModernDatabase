@@ -16,7 +16,7 @@ namespace Core.Entities.OrderNeo4j
             uuid = Guid.NewGuid().ToString();
             BuyerEmail = order.BuyerEmail;
             OrderDate = order.OrderDate;
-            ShipToAddress = JsonSerializer.Serialize<Address>(order.ShipToAddress);
+            //ShipToAddress = JsonSerializer.Serialize<Address>(order.ShipToAddress);
             Subtotal = order.Subtotal;
             Status = order.Status.ToString();
             PaymentIntentId = order.PaymentIntentId;
@@ -25,7 +25,7 @@ namespace Core.Entities.OrderNeo4j
         public string uuid { get; set; }
         public string BuyerEmail { get; set; }
         public DateTimeOffset OrderDate { get; set; }
-        public string ShipToAddress { get; set; }
+        //public string ShipToAddress { get; set; }
         public decimal Subtotal { get; set; }
         public string Status { get; set; }
         public string PaymentIntentId { get; set; }

@@ -55,13 +55,29 @@ namespace Infrastructure.Data
             {
                 var tempId = tempOrder.uuid;
                 var ret = await _client.Cypher.Match("(ord:ORDER), (method:DELIVERYMETHOD)")
-                              .Where("ord.uuid = $uuid and method.Id = $Id")
-                              .Create("(ord)-[r:USE]->(method)")
-                              .WithParams(new { uuid = tempId, Id = order.DeliveryMethod.Id })
-                              .Return(r => r.As<string>())
-                              .ResultsAsync;
+                                              .Where("ord.uuid = $uuid and method.Id = $Id")
+                                              .Create("(ord)-[r:USE]->(method)")
+                                              .WithParams(new { uuid = tempId, Id = order.DeliveryMethod.Id })
+                                              .Return(r => r.As<string>())
+                                              .ResultsAsync;
 
                 if (ret == null)
+                {
+                    await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->()")
+                                        .Where<OrderNeo4j>(ord => ord.uuid == tempId)
+                                        .Delete("ord, r")
+                                        .ExecuteWithoutResultsAsync();
+                    return null;
+                }
+
+                var retUser = await _client.Cypher.Match("(ord:ORDER), (user:USER)")
+                                                  .Where("ord.uuid = $uuid and user.BuyerEmail = $email")
+                                                  .Create("(ord)<-[r:ARRANGE]-(user)")
+                                                  .WithParams(new { uuid = tempId, user = order.BuyerEmail })
+                                                  .Return(r => r.As<string>())
+                                                  .ResultsAsync;
+
+                if (retUser == null)
                 {
                     await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->()")
                                         .Where<OrderNeo4j>(ord => ord.uuid == tempId)
@@ -106,21 +122,21 @@ namespace Infrastructure.Data
             if (!_client.IsConnected)
                 return null;
 
-
-            var result = await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->(pro), (ord:ORDER)-[:USE]->(method)")
+            var result = await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->(pro), (ord:ORDER)-[:USE]->(method), (ord:ORDER)<-[:ARRANGE]-(user:USER)")
                                                    .Where(spec.Criteria)
-                                                   .Return((ord, pro, r,method) => new {
+                                                   .Return((ord, pro, r, method, user) => new {
                                                        Order = ord.As<OrderNeo4j>(),
                                                        Method = method.As<DeliveryMethod>(),
                                                        ContainRelated = r.CollectAs<ContainRelationshipNeo4j>(),
-                                                       Pros = pro.CollectAs<ProductNeo4j>()
+                                                       Pros = pro.CollectAs<ProductNeo4j>(),
+                                                       Users = user.As<UserNeo4j>()
                                                    })
                                                    .ResultsAsync;
             var temp = result.Single();
             if (result == null || temp == null)
                 return null;
 
-            var ret = mappingOrder(temp.Order, temp.Method, temp.ContainRelated.ToList(), temp.Pros.ToList());
+            var ret = mappingOrder(temp.Order, temp.Method, temp.Users, temp.ContainRelated.ToList(), temp.Pros.ToList());
             return ret;
         }
 
@@ -131,13 +147,14 @@ namespace Infrastructure.Data
                 return null;
 
 
-            var result = await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->(pro), (ord:ORDER)-[:USE]->(method)")
+            var result = await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->(pro), (ord:ORDER)-[:USE]->(method), (user:USER)-[:ARRANGE]->(ord:ORDER)")
                                                    .Where(spec.Criteria)
-                                                   .Return((ord, pro, r, method) => new {
+                                                   .Return((ord, pro, r, method, user) => new {
                                                        Order = ord.As<OrderNeo4j>(),
                                                        Method = method.As<DeliveryMethod>(),
                                                        ContainRelated = r.CollectAs<ContainRelationshipNeo4j>(),
-                                                       Pros = pro.CollectAs<ProductNeo4j>()
+                                                       Pros = pro.CollectAs<ProductNeo4j>(),
+                                                       Users = user.As<UserNeo4j>()
                                                    })
                                                    .ResultsAsync;
             var temp = result.ToList();
@@ -147,7 +164,7 @@ namespace Infrastructure.Data
             var ret = new List<Order>();
             foreach (var i in temp)
             {
-                var tempItem = mappingOrder(i.Order,i.Method, i.ContainRelated.ToList(), i.Pros.ToList());
+                var tempItem = mappingOrder(i.Order,i.Method,i.Users, i.ContainRelated.ToList(), i.Pros.ToList());
                 ret.Add(tempItem);
             }
             return ret;
@@ -167,6 +184,7 @@ namespace Infrastructure.Data
 
         private Order mappingOrder(OrderNeo4j sourceOrder,
                                   DeliveryMethod deliveryMethod,
+                                  UserNeo4j user,
                                   List<ContainRelationshipNeo4j> sourceListRelatation,
                                   List<ProductNeo4j> sourceListPro)
         {
@@ -176,7 +194,13 @@ namespace Infrastructure.Data
             ret.DeliveryMethod = deliveryMethod;
             ret.OrderDate = sourceOrder.OrderDate;
             ret.PaymentIntentId = sourceOrder.PaymentIntentId;
-            ret.ShipToAddress = JsonSerializer.Deserialize<Address>(sourceOrder.ShipToAddress);
+            ret.ShipToAddress = new Address();
+            ret.ShipToAddress.FirstName = user.FirstName;
+            ret.ShipToAddress.LastName = user.LastName;
+            ret.ShipToAddress.State = user.State;
+            ret.ShipToAddress.Street = user.Street;
+            ret.ShipToAddress.ZipCode = user.ZipCode;
+
             OrderStatus tempStatus;
             if (Enum.TryParse<OrderStatus>(sourceOrder.Status, out tempStatus))
             {

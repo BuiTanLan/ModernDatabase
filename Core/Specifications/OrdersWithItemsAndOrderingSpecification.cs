@@ -5,16 +5,16 @@ using Core.Entities.OrderNeo4j;
 
 namespace Core.Specifications
 {
-    public class OrdersWithItemsAndOrderingSpecification: BaseSpecification<OrderNeo4j>
+    public class OrdersWithItemsAndOrderingSpecification : BaseSpecification<OrderNeo4j>
     {
-        public OrdersWithItemsAndOrderingSpecification(string email ) 
-            : base(ord =>ord.BuyerEmail == email)
+        public OrdersWithItemsAndOrderingSpecification(string email)
+            : base(user => user.BuyerEmail == email)
         {
             //AddIncluded(o => o.OrderItems);
             //AddIncluded(o => o.DeliveryMethod);
         }
         public OrdersWithItemsAndOrderingSpecification(string id, string email)
-            : base(ord => ord.uuid == id && ord.BuyerEmail ==email)
+            : base(ord => ord.uuid == id && ord.BuyerEmail == email)
         {
             //AddIncluded(o => o.OrderItems);
             //AddIncluded(o => o.DeliveryMethod);
