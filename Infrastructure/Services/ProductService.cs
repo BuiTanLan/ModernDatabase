@@ -76,5 +76,10 @@ namespace Infrastructure.Services
         {
             return await _proRepo.GetProductTypesAsync();
         }
+
+        public async Task<List<Product>> GetRecommendedProduct(string id)
+        {
+            return await _proRepo.GetRecommendedProduct(id);
+        }
     }
 }

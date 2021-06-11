@@ -54,6 +54,17 @@ namespace Infrastructure.Data
             if (!_client.IsConnected)
                 return;
 
+            var type = await _mongoDbService.ProductType.Find(e => e._id == entity.ProductType._id).SingleOrDefaultAsync();
+            if (type == null)
+                return;
+
+            var brand = await _mongoDbService.ProductBrand.Find(e => e._id == entity.ProductBrand._id).SingleOrDefaultAsync();
+            if (brand == null)
+                return;
+
+            entity.ProductBrand.Name = brand.Name;
+            entity.ProductType.Name = type.Name;
+
             await _mongoDbService.Product.InsertOneAsync(entity);
 
 
@@ -63,20 +74,30 @@ namespace Infrastructure.Data
             //                                 .WithParams(new { uuid = entity._id, newProduct = entity })
             //                                 .Return(pro => pro.As<ProductNeo4j>().uuid)
             //                                 .ResultsAsync;
+            
+            try
+            {
+                var tempProduct = new ProductNeo4j(entity);
 
-            var tempProduct = new ProductNeo4j(entity);
-
-            var result = await _client.Cypher.Create("(pro:PRODUCT)")
-                                             .Set("pro = {newProduct}")
-                                             .WithParams(new { newProduct = tempProduct })
-                                             .Return(pro => pro.As<ProductNeo4j>().uuid)
-                                             .ResultsAsync;
-
-            if (result == null)
+                var result = await _client.Cypher.Create("(pro:PRODUCT)")
+                                                 .Set("pro = $newProduct")
+                                                 .WithParams(new { newProduct = tempProduct })
+                                                 .Return(pro => pro.As<ProductNeo4j>().uuid)
+                                                 .ResultsAsync;
+                if (result == null)
+                {
+                    var filter = Builders<Product>.Filter.Eq(e => e._id, entity._id);
+                    await _mongoDbService.Product.DeleteOneAsync(filter);
+                }
+            }
+            catch(Exception ex)
             {
                 var filter = Builders<Product>.Filter.Eq(e => e._id, entity._id);
                 await _mongoDbService.Product.DeleteOneAsync(filter);
+                return;
             }
+
+
         }
 
         public async Task<int> CountAsync(ISpecification<Product> spec)
@@ -91,15 +112,24 @@ namespace Infrastructure.Data
             var filter = Builders<Product>.Filter.Eq(e => e._id, entity._id);
             var delResult = await _mongoDbService.Product.DeleteOneAsync(filter);
 
-            var result = await _client.Cypher.Match("(pro:PRODUCT)")
-                   .Where("pro.ProductItemId = $id")
-                   .Set("pro.IsDeleted = 1")
-                   .WithParams(new { id = entity._id })
-                   .Return(pro => pro.As<ProductNeo4j>().uuid)
-                   .ResultsAsync;
+            try
+            {
+                var result = await _client.Cypher.Match("(pro:PRODUCT)<-[r:BUY]-()")
+                       .Where("pro.ProductItemId = $id")
+                       .Set("pro.IsDeleted = 1")
+                       .Delete("r")
+                       .WithParams(new { id = entity._id })
+                       .Return(pro => pro.As<ProductNeo4j>().uuid)
+                       .ResultsAsync;
 
-            var temp = result.Single();
-            if (temp == null)
+                var temp = result.Single();
+                if (temp == null)
+                {
+                    await _mongoDbService.Product.InsertOneAsync(entity);
+                    return;
+                }              
+            }
+            catch (Exception ex)
             {
                 await _mongoDbService.Product.InsertOneAsync(entity);
             }
@@ -132,23 +162,68 @@ namespace Infrastructure.Data
         {
             var filter = Builders<Product>.Filter.Eq(e => e._id, entity._id);
             var backupProduct = await _mongoDbService.Product.Find(filter).SingleOrDefaultAsync();
+            try
+            {
 
-            await _mongoDbService.Product.ReplaceOneAsync(filter,entity);
+                await _mongoDbService.Product.ReplaceOneAsync(filter, entity);
 
-            var updatedProduct = new ProductNeo4j(entity);
+                var updatedProduct = new ProductNeo4j(entity);
 
-            var result = await _client.Cypher.Match("(pro:PRODUCT)")
-                                               .Where("pro.ProductItemId = $id")
-                                               .Set("pro = $product")
-                                               .WithParams(new { id = entity._id, product = updatedProduct })
-                                               .Return(pro => pro.As<ProductNeo4j>().uuid)
-                                               .ResultsAsync;
+                var result = await _client.Cypher.Match("(pro:PRODUCT)")
+                                                   .Where("pro.ProductItemId = $id")
+                                                   .Set("pro = $product")
+                                                   .WithParams(new { id = entity._id, product = updatedProduct })
+                                                   .Return(pro => pro.As<ProductNeo4j>().uuid)
+                                                   .ResultsAsync;
 
-            var temp = result.Single();
-            if (temp == null)
+                var temp = result.Single();
+                if (temp == null)
+                {
+                    await _mongoDbService.Product.ReplaceOneAsync(filter, backupProduct);
+                    return;
+                }
+            }
+            catch (Exception ex)
             {
                 await _mongoDbService.Product.ReplaceOneAsync(filter, backupProduct);
             }
+        }
+
+        public async Task<List<Product>> GetRecommendedProduct(string id)
+        {
+            try
+            {
+                await _client.ConnectAsync();
+                if (!_client.IsConnected)
+                    return null;
+
+                var productList = await _client.Cypher.Match("(pro:PRODUCT)<-[:BUY]-(u:USER)-[:BUY]->(rec:PRODUCT)")
+                                                      .Where<ProductNeo4j>(pro => pro.ProductItemId == "60ba6a410d59ab50c4c9617a")
+                                                       .Return((rec) => new {
+                                                           Recommendation = rec.As<ProductNeo4j>().ProductItemId,
+                                                           Count = rec.Count()
+                                                       })
+                                                       .OrderByDescending("Count")
+                                                       .Limit(5)
+                                                       .ResultsAsync;
+                var temp = productList.ToList();
+                if (temp != null)
+                {
+                    if (temp.Count() != 0)
+                    {
+                        var idList = temp.Select(e => e.Recommendation).ToList();
+
+                        var productInList = await _mongoDbService.Product.Find(e => idList.Contains(e._id)).ToListAsync();
+
+                        return productInList;
+                    }
+                }
+                return null;
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }       
         }
 
         private IFindFluent<Product, Product> ApplySpecification(ISpecification<Product> spec)

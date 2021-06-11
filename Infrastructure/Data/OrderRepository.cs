@@ -39,7 +39,7 @@ namespace Infrastructure.Data
             //                    .WithParams(new { newOrder.id, newOrder})
             //                    .Match("(pro:PRODUCT) {id: {uuid}}")
             //                    .Merge("()")
-
+            
 
             var orderID = await _client.Cypher.Create("(ord:ORDER)")
                                              .Set("ord = $order")
@@ -50,67 +50,95 @@ namespace Infrastructure.Data
 
             var tempOrder = orderID.SingleOrDefault();
 
-
-            if (tempOrder != null)
+            try
             {
-                var tempId = tempOrder.uuid;
-                var ret = await _client.Cypher.Match("(ord:ORDER), (method:DELIVERYMETHOD)")
-                                              .Where("ord.uuid = $uuid and method.Id = $Id")
-                                              .Create("(ord)-[r:USE]->(method)")
-                                              .WithParams(new { uuid = tempId, Id = order.DeliveryMethod.Id })
-                                              .Return(r => r.As<string>())
-                                              .ResultsAsync;
-
-                if (ret == null)
+                if (tempOrder != null)
                 {
-                    await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->()")
-                                        .Where<OrderNeo4j>(ord => ord.uuid == tempId)
-                                        .Delete("ord, r")
-                                        .ExecuteWithoutResultsAsync();
-                    return null;
-                }
-
-                var retUser = await _client.Cypher.Match("(ord:ORDER), (user:USER)")
-                                                  .Where("ord.uuid = $uuid and user.BuyerEmail = $email")
-                                                  .Create("(ord)<-[r:ARRANGE]-(user)")
-                                                  .WithParams(new { uuid = tempId, user = order.BuyerEmail })
+                    var tempId = tempOrder.uuid;
+                    var ret = await _client.Cypher.Match("(ord:ORDER), (method:DELIVERYMETHOD)")
+                                                  .Where("ord.uuid = $uuid and method.Id = $Id")
+                                                  .Create("(ord)-[r:USE]->(method)")
+                                                  .WithParams(new { uuid = tempId, Id = order.DeliveryMethod.Id })
                                                   .Return(r => r.As<string>())
                                                   .ResultsAsync;
 
-                if (retUser == null)
-                {
-                    await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->()")
-                                        .Where<OrderNeo4j>(ord => ord.uuid == tempId)
-                                        .Delete("ord, r")
-                                        .ExecuteWithoutResultsAsync();
-                    return null;
-                }
-
-
-                foreach (var i in order.OrderItems)
-                {
-                    var tempProID = i.ItemOrdered.ProductItemId;
-                    var result1 = await _client.Cypher.Match("(ord:ORDER)", "(pro: PRODUCT)")
-                                                      .Where("ord.uuid = $uuid and pro.ProductItemId = $mongoID")
-                                                      .Create("(ord)-[r:CONTAIN]->(pro)")
-                                                      .Set("r = $rela")
-                                                      .WithParams(new
-                                                      {
-                                                          uuid = tempId,
-                                                          mongoID = tempProID,
-                                                          rela = new ContainRelationshipNeo4j(i.Quantity)
-                                                      })
-                                                      .Return(r => r.As<ContainRelationshipNeo4j>().Quantity)
-                                                      .ResultsAsync;
-                    if (result1 == null)
+                    if (ret.Single() == null)
                     {
-                        await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->()")
+                        await _client.Cypher.Match("(ord:ORDER)-[r]->()")
                                             .Where<OrderNeo4j>(ord => ord.uuid == tempId)
                                             .Delete("ord, r")
                                             .ExecuteWithoutResultsAsync();
                         return null;
                     }
+
+                    var retUser = await _client.Cypher.Match("(ord:ORDER), (user:USER)")
+                                                      .Where("ord.uuid = $uuid and user.BuyerEmail = $email")
+                                                      .Create("(ord)<-[r:ARRANGE]-(user)")
+                                                      .WithParams(new { uuid = tempId, user = order.BuyerEmail })
+                                                      .Return(r => r.As<string>())
+                                                      .ResultsAsync;
+
+                    if (retUser.Single() == null)
+                    {
+                        await _client.Cypher.Match("(ord:ORDER)-[r]->()")
+                                            .Where<OrderNeo4j>(ord => ord.uuid == tempId)
+                                            .Delete("ord, r")
+                                            .ExecuteWithoutResultsAsync();
+                        return null;
+                    }
+
+
+                    foreach (var i in order.OrderItems)
+                    {
+                        var tempProID = i.ItemOrdered.ProductItemId;
+                        var result1 = await _client.Cypher.Match("(ord:ORDER)", "(pro: PRODUCT)")
+                                                          .Where("ord.uuid = $uuid and pro.ProductItemId = $mongoID")
+                                                          .Create("(ord)-[r:CONTAIN]->(pro)")
+                                                          .Set("r = $rela")
+                                                          .WithParams(new
+                                                          {
+                                                              uuid = tempId,
+                                                              mongoID = tempProID,
+                                                              rela = new ContainRelationshipNeo4j(i.Quantity)
+                                                          })
+                                                          .Return(r => r.As<ContainRelationshipNeo4j>())
+                                                          .ResultsAsync;
+                        if (result1.Single() == null)
+                        {
+                            await _client.Cypher.Match("(ord:ORDER)-[r]->()")
+                                                .Where<OrderNeo4j>(ord => ord.uuid == tempId)
+                                                .Delete("ord, r")
+                                                .ExecuteWithoutResultsAsync();
+                            return null;
+                        }
+
+                        var result2 = await _client.Cypher.Match("(user:USER)", "(pro: PRODUCT)")
+                                                          .Where("user.BuyerEmail = $email and pro.ProductItemId = $mongoID")
+                                                          .Merge("(user)-[r:BUY]->(pro)")
+                                                          .WithParams(new
+                                                          {
+                                                              email = order.BuyerEmail,
+                                                              mongoID = tempProID
+                                                          })
+                                                          .Return(r => r.As<string>())
+                                                          .ResultsAsync;
+                        if (result2.Single() == null)
+                        {
+                            await _client.Cypher.Match("(ord:ORDER)-[r]->()")
+                                                .Where<OrderNeo4j>(ord => ord.uuid == tempId)
+                                                .Delete("ord, r")
+                                                .ExecuteWithoutResultsAsync();
+                            return null;
+                        }
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                await _client.Cypher.Match("(ord:ORDER)-[r]->()")
+                                    .Where<OrderNeo4j>(ord => ord.uuid == tempOrder.uuid)
+                                    .Delete("ord, r")
+                                    .ExecuteWithoutResultsAsync();
             }
                                        
             return order;

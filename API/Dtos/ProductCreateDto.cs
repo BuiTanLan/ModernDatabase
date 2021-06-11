@@ -14,8 +14,8 @@ namespace API.Dtos
         //     ErrorMessage = "Price must be a decimal (e.g 20.30)")]
         public string PictureUrl { get; set; }
         [Required]
-        public int ProductTypeId { get; set; }
+        public string ProductTypeId { get; set; }
         [Required]
-        public int ProductBrandId { get; set; }
+        public string ProductBrandId { get; set; }
     }
 }

@@ -7,6 +7,15 @@ namespace Core.Entities
 {
     public class Product : BaseEntityMongo
     {
+        public Product()
+        {
+            _photos = new List<Photo>();
+        }
+
+        //public Product(ProductNeo4j)
+        //{
+
+        //}
         //[BsonId]
         //[BsonRepresentation(BsonType.ObjectId)]
         //public string _id { get; set; }

@@ -20,6 +20,7 @@ namespace Core.Interfaces
         Task Add(Product entity);
         Task Update(Product entity);
         Task Delete(Product entity);
+        Task<List<Product>> GetRecommendedProduct(string id);
 
     }
 }

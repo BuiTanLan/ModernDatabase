@@ -89,12 +89,25 @@ namespace API.Controllers
             return Ok(await _productService.GetProductTypesAsync());
         }
 
+        [Cached(600)]
+        [HttpGet("recommend/{id}")]
+        public async Task<ActionResult<List<Product>>> GetRecommendProducts(string id)
+        {
+            return Ok(await _productService.GetRecommendedProduct(id));
+        }
+
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Product>> CreateProduct(ProductCreateDto productToCreate)
         {
             var product = _mapper.Map<ProductCreateDto, Product>(productToCreate);
+            product.ProductBrand = new ProductBrand();
+            product.ProductBrand._id = productToCreate.ProductBrandId;
+
+            product.ProductType = new ProductType();
+            product.ProductType._id = productToCreate.ProductTypeId;
+
             try
             {
                 await _productService.Add(product);
