@@ -210,6 +210,22 @@ namespace Infrastructure.Data
             return result.ToList();
         }
 
+        public async Task<bool> CheckUserBuyProduct(string buyerEmail, string productID)
+        {
+            await _client.ConnectAsync();
+            if (!_client.IsConnected)
+                return false;
+
+            var result2 = await _client.Cypher.Match("((user:USER)-[:BUY]->(pro: PRODUCT))")
+                                              .Where("user.BuyerEmail = $email and pro.ProductItemId = $mongoID")
+                                              .WithParams(new { email = buyerEmail, mongoID = productID })
+                                              .Return(user => user.As<UserNeo4j>().BuyerEmail)
+                                              .ResultsAsync;
+            var temp = result2.Single();
+            return (temp == null) ? false : true;
+        }
+
+
         private Order mappingOrder(OrderNeo4j sourceOrder,
                                   DeliveryMethod deliveryMethod,
                                   UserNeo4j user,

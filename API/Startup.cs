@@ -7,6 +7,7 @@ using API.Extensions;
 using API.Helpers;
 using API.Middlewares;
 using AutoMapper;
+using Cassandra;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Identity;
@@ -66,6 +67,16 @@ namespace API
             var driver = GraphDatabase.Driver(info["Neo4jServer"], AuthTokens.Basic(info["Neo4jUserName"], info["Neo4jPassword"]));
             var neo4jClient = new BoltGraphClient(driver);
             services.AddSingleton<IGraphClient>(neo4jClient);
+
+
+            // add cassandra
+            var cluster = Cluster.Builder()
+                                 .AddContactPoints("localhost")
+                                 .Build();
+
+            services.AddSingleton<ICluster>(cluster);
+
+            //var session = cluster.Connect();
 
             services.AddApplicationServices();
             services.AddIdentityServices(_config);
