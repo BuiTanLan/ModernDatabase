@@ -70,8 +70,9 @@ namespace API
 
 
             // add cassandra
+            info = _config.GetSection("Cassandra");
             var cluster = Cluster.Builder()
-                                 .AddContactPoints("localhost")
+                                 .AddContactPoints(info["ContactPoint"])
                                  .Build();
 
             services.AddSingleton<ICluster>(cluster);
