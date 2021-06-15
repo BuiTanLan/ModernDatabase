@@ -16,10 +16,12 @@ namespace Infrastructure.Data
     {
         private readonly MongoDbService _mongoDbService;
         private readonly IGraphClient _client;
-        public ProductRepository(MongoDbService mongoDbService, IGraphClient client)
+        private readonly ICommentRepository _commentRepository;
+        public ProductRepository(MongoDbService mongoDbService, IGraphClient client, ICommentRepository commentRepository)
         {
             _mongoDbService = mongoDbService;
             _client = client;
+            _commentRepository = commentRepository;
         }
 
         public async Task<IReadOnlyList<ProductBrand>> GetProductBrandsAsync()
@@ -127,7 +129,12 @@ namespace Infrastructure.Data
                 {
                     await _mongoDbService.Product.InsertOneAsync(entity);
                     return;
-                }              
+                }
+
+                //try
+                //{
+                    await _commentRepository.DeleteMany(entity._id);
+                //}
             }
             catch (Exception ex)
             {
