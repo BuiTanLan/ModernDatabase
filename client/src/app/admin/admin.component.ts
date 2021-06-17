@@ -21,8 +21,8 @@ export class AdminComponent implements OnInit {
   ngOnInit(): void {
     this.getProducts();
   }
-  getProducts(useCache = false) {
-    this.shopService.getProducts(useCache).subscribe(response => {
+  getProducts() {
+    this.shopService.getProducts().subscribe(response => {
       this.products = response.data;
       this.totalCount = response.count;
     }, error => {
@@ -35,11 +35,11 @@ export class AdminComponent implements OnInit {
     if (params.pageNumber !== event) {
       params.pageNumber = event;
       this.shopService.setShopParams(params);
-      this.getProducts(true);
+      this.getProducts();
     }
   }
 
-  deleteProduct(id: number) {
+  deleteProduct(id: string) {
     this.adminService.deleteProduct(id).subscribe((response: any) => {
       this.products.splice(this.products.findIndex(p => p.id === id), 1);
       this.totalCount--;

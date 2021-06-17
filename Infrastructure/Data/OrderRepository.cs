@@ -161,7 +161,7 @@ namespace Infrastructure.Data
                                                    })
                                                    .ResultsAsync;
             var temp = result.Single();
-            if (result == null || temp == null)
+            if (temp == null)
                 return null;
 
             var ret = mappingOrder(temp.Order, temp.Method, temp.Users, temp.ContainRelated.ToList(), temp.Pros.ToList());
@@ -186,8 +186,6 @@ namespace Infrastructure.Data
                                                    })
                                                    .ResultsAsync;
             var temp = result.ToList();
-            if (result == null || temp == null)
-                return null;
 
             var ret = new List<Order>();
             foreach (var i in temp)
@@ -222,7 +220,7 @@ namespace Infrastructure.Data
                                               .Return(user => user.As<UserNeo4j>().BuyerEmail)
                                               .ResultsAsync;
             var temp = result2.Single();
-            return (temp == null) ? false : true;
+            return (temp != null);
         }
 
 
@@ -232,18 +230,22 @@ namespace Infrastructure.Data
                                   List<ContainRelationshipNeo4j> sourceListRelatation,
                                   List<ProductNeo4j> sourceListPro)
         {
-            var ret = new Order();
-            ret.id = sourceOrder.uuid;
-            ret.BuyerEmail = sourceOrder.BuyerEmail;
-            ret.DeliveryMethod = deliveryMethod;
-            ret.OrderDate = sourceOrder.OrderDate;
-            ret.PaymentIntentId = sourceOrder.PaymentIntentId;
-            ret.ShipToAddress = new Address();
-            ret.ShipToAddress.FirstName = user.FirstName;
-            ret.ShipToAddress.LastName = user.LastName;
-            ret.ShipToAddress.State = user.State;
-            ret.ShipToAddress.Street = user.Street;
-            ret.ShipToAddress.ZipCode = user.ZipCode;
+            var ret = new Order
+            {
+                id = sourceOrder.uuid,
+                BuyerEmail = sourceOrder.BuyerEmail,
+                DeliveryMethod = deliveryMethod,
+                OrderDate = sourceOrder.OrderDate,
+                PaymentIntentId = sourceOrder.PaymentIntentId,
+                ShipToAddress = new Address
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    State = user.State,
+                    Street = user.Street,
+                    ZipCode = user.ZipCode
+                }
+            };
 
             OrderStatus tempStatus;
             if (Enum.TryParse<OrderStatus>(sourceOrder.Status, out tempStatus))

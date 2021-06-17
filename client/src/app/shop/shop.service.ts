@@ -47,7 +47,7 @@ export class ShopService {
   }
 
 
-  getProduct(id: number) {
+  getProduct(id: string) {
     let product: IProduct;
     this.productCache.forEach((products: IProduct[]) => {
       console.log(product);
@@ -62,18 +62,7 @@ export class ShopService {
   }
 
 
-  getProducts(useCache: boolean) {
-    if (useCache === false) {
-      this.productCache = new Map();
-    }
-
-    if (this.productCache.size > 0 && useCache === true) {
-      if (this.productCache.has(Object.values(this.shopParams).join('-'))) {
-        this.pagination.data = this.productCache.get(Object.values(this.shopParams).join('-'));
-        return of(this.pagination);
-      }
-    }
-
+  getProducts() {
     let params = new HttpParams();
     if (this.shopParams.brandName) {
       params = params.append('brandName', this.shopParams.brandName);
