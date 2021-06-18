@@ -10,7 +10,7 @@ export class ProductCommentComponent implements OnInit {
   data = [
     {
       author: 'Han Solo',
-      avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+      avatar: 'https://lled.educ.ubc.ca/files/2017/05/people-placeholder.png',
       content:
         'We supply a series of design principles, practical patterns and high quality design resources' +
         '(Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
@@ -18,7 +18,7 @@ export class ProductCommentComponent implements OnInit {
     },
     {
       author: 'Han Solo',
-      avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+      avatar: 'https://lled.educ.ubc.ca/files/2017/05/people-placeholder.png',
       content:
         'We supply a series of design principles, practical patterns and high quality design resources' +
         '(Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',

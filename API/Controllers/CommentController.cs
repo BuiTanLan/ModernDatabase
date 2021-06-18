@@ -46,7 +46,6 @@ namespace API.Controllers
             {
                 var user = await _userManager.FindByUserByClaimsPrincipleWithAddressAsync(HttpContext.User);
                 if (user == null) return BadRequest("user null");
-
                 comment.userName = user.Email;
 
                 return Ok(await _commentService.AddComment(comment));
