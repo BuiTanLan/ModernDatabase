@@ -7,7 +7,7 @@ namespace Core.Interfaces
 {
     public interface ICommentRepository
     {
-        public Task DeleteMany(string productID);
+        public Task DeleteMany(string productId);
         public Task<Comment> Add(Comment comment);
         public Task<List<Comment>> GetAll();
         public Task<List<Comment>> GetAllByProduct(string productID);

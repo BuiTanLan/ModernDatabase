@@ -176,7 +176,6 @@ namespace Infrastructure.Data
 
 
             var result = await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->(pro), (ord:ORDER)-[:USE]->(method), (user:USER)-[:ARRANGE]->(ord:ORDER)")
-                                                   .Where(spec.Criteria)
                                                    .Return((ord, pro, r, method, user) => new {
                                                        Order = ord.As<OrderNeo4j>(),
                                                        Method = method.As<DeliveryMethod>(),
