@@ -31,9 +31,11 @@ namespace Infrastructure.Services
             _orderRepository = orderRepository;
         }
         public async Task<Order> CreateOrderAsync(string buyerEmail, int deliveryMethodId, string basketId, Address shippingAddress)
+        //public async Task<Order> CreateOrder(Order order)
         {
             //get basket from repo
             var basket = await _basketRepo.GetBasketAsync(basketId);
+
             //get item from produtc repo
             var items = new List<OrderItem>();
             foreach (var item in basket.Items)
@@ -77,7 +79,6 @@ namespace Infrastructure.Services
 
             // return db
             return order;
-
         }
 
         public async Task<IReadOnlyList<DeliveryMethod>> GetDeliveryMethodsAsync()

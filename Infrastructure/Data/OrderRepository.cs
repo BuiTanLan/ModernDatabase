@@ -74,7 +74,7 @@ namespace Infrastructure.Data
                     var retUser = await _client.Cypher.Match("(ord:ORDER), (user:USER)")
                                                       .Where("ord.uuid = $uuid and user.BuyerEmail = $email")
                                                       .Create("(ord)<-[r:ARRANGE]-(user)")
-                                                      .WithParams(new { uuid = tempId, user = order.BuyerEmail })
+                                                      .WithParams(new { uuid = tempId, email = order.BuyerEmail })
                                                       .Return(r => r.As<string>())
                                                       .ResultsAsync;
 

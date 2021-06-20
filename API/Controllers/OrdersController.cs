@@ -34,10 +34,22 @@ namespace API.Controllers
             var address = _mapper.Map<AddressDto, Address>(orderDto.ShipToAddress);
             var order = await _orderService.CreateOrderAsync(email, orderDto.DeliveryMethodId,
              orderDto.BasketId, address);
-             if(order == null)
+            if (order == null)
                 return BadRequest(new ApiResponse(400, "Problem creating order"));
             return Ok(order);
         }
+
+        //[HttpPost]
+        //public async Task<ActionResult<Order>> CreateOrder(Order orderDto)
+        //{
+        //    var email = HttpContext.User.RetrieveEmailFromPrincipal();
+        //    //var address = _mapper.Map<AddressDto, Address>(orderDto.ShipToAddress);
+        //    var order = await _orderService.CreateOrder(orderDto);
+        //    if (order == null)
+        //        return BadRequest(new ApiResponse(400, "Problem creating order"));
+        //    return Ok(order);
+        //}
+
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetOrderForUser()
         {
