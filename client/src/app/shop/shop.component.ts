@@ -46,14 +46,13 @@ export class ShopComponent implements OnInit {
         this.shopParams.search = params.search || '';
         this.shopParams.brandName = params.brand || 'all';
         this.shopParams.typeName = params.type || 'all';
-
       });
-    this.getProducts(true);
+    this.getProducts();
   }
 
 
-  getProducts(useCache = false) {
-    this.shopService.getProducts(useCache).pipe(
+  getProducts() {
+    this.shopService.getProducts().pipe(
     ).subscribe(
       (response: IPagination) => {
         this.products = response.data;
@@ -142,7 +141,7 @@ export class ShopComponent implements OnInit {
     if (params.pageNumber !== event) {
       params.pageNumber = event;
       this.shopService.setShopParams(params);
-      this.getProducts(true);
+      this.getProducts();
       this.router.navigate(['/shop/page', this.shopParams.pageNumber], {
         queryParamsHandling: 'merge',
       });

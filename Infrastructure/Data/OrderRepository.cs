@@ -15,7 +15,7 @@ namespace Infrastructure.Data
 {
     public class OrderRepository : IOrderRepository
     {
-        public IGraphClient _client;
+        private readonly IGraphClient _client;
         public OrderRepository(IGraphClient client)
         {
             _client = client;
@@ -24,8 +24,7 @@ namespace Infrastructure.Data
         {
 
             await _client.ConnectAsync();
-            if (!_client.IsConnected)
-                return null;
+            if (!_client.IsConnected) throw new Exception();
 
             var newOrder = new OrderNeo4j(order);
            
@@ -161,41 +160,39 @@ namespace Infrastructure.Data
                                                    })
                                                    .ResultsAsync;
             var temp = result.Single();
-            if (result == null || temp == null)
+            if (temp == null)
                 return null;
 
             var ret = mappingOrder(temp.Order, temp.Method, temp.Users, temp.ContainRelated.ToList(), temp.Pros.ToList());
             return ret;
         }
 
-        public async Task<IReadOnlyList<Order>> ListAsync(ISpecification<OrderNeo4j> spec)
+        public async Task<IReadOnlyList<Order>> ListAsync(string buyerEmail)
         {
             await _client.ConnectAsync();
             if (!_client.IsConnected)
                 return null;
 
 
-            var result = await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->(pro), (ord:ORDER)-[:USE]->(method), (user:USER)-[:ARRANGE]->(ord:ORDER)")
-                                                   .Where(spec.Criteria)
-                                                   .Return((ord, pro, r, method, user) => new {
+            var result = await _client.Cypher.Match("(ord:ORDER)")
+                                                    .Where("ord.BuyerEmail = $email")
+                                                    .WithParams(new { email = buyerEmail})
+                                                     .Return((ord) => new {
                                                        Order = ord.As<OrderNeo4j>(),
-                                                       Method = method.As<DeliveryMethod>(),
-                                                       ContainRelated = r.CollectAs<ContainRelationshipNeo4j>(),
-                                                       Pros = pro.CollectAs<ProductNeo4j>(),
-                                                       Users = user.As<UserNeo4j>()
+                                                       //Method = method.As<DeliveryMethod>(),
+                                                       // ContainRelated = r.CollectAs<ContainRelationshipNeo4j>(),
+                                                       // Pros = pro.CollectAs<ProductNeo4j>(),
+                                                       // Users = user.As<UserNeo4j>()
                                                    })
                                                    .ResultsAsync;
-            var temp = result.ToList();
-            if (result == null || temp == null)
-                return null;
-
-            var ret = new List<Order>();
-            foreach (var i in temp)
+            var listOrder = result.Select(x => new Order
             {
-                var tempItem = mappingOrder(i.Order,i.Method,i.Users, i.ContainRelated.ToList(), i.Pros.ToList());
-                ret.Add(tempItem);
-            }
-            return ret;
+                Id =  x.Order.uuid,
+                OrderDate =  x.Order.OrderDate,
+                Total = x.Order.Total,
+                Status = x.Order.Status
+            }).ToList();
+            return listOrder;
         }
 
         public async Task<IReadOnlyList<DeliveryMethod>> GetDeliveryMethodsAsync()
@@ -222,7 +219,7 @@ namespace Infrastructure.Data
                                               .Return(user => user.As<UserNeo4j>().BuyerEmail)
                                               .ResultsAsync;
             var temp = result2.Single();
-            return (temp == null) ? false : true;
+            return (temp != null);
         }
 
 
@@ -232,24 +229,28 @@ namespace Infrastructure.Data
                                   List<ContainRelationshipNeo4j> sourceListRelatation,
                                   List<ProductNeo4j> sourceListPro)
         {
-            var ret = new Order();
-            ret.id = sourceOrder.uuid;
-            ret.BuyerEmail = sourceOrder.BuyerEmail;
-            ret.DeliveryMethod = deliveryMethod;
-            ret.OrderDate = sourceOrder.OrderDate;
-            ret.PaymentIntentId = sourceOrder.PaymentIntentId;
-            ret.ShipToAddress = new Address();
-            ret.ShipToAddress.FirstName = user.FirstName;
-            ret.ShipToAddress.LastName = user.LastName;
-            ret.ShipToAddress.State = user.State;
-            ret.ShipToAddress.Street = user.Street;
-            ret.ShipToAddress.ZipCode = user.ZipCode;
+            var ret = new Order
+            {
+                Id = sourceOrder.uuid,
+                BuyerEmail = sourceOrder.BuyerEmail,
+                DeliveryMethod = deliveryMethod,
+                OrderDate = sourceOrder.OrderDate,
+                PaymentIntentId = sourceOrder.PaymentIntentId,
+                ShipToAddress = new Address
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    State = user.State,
+                    Street = user.Street,
+                    ZipCode = user.ZipCode
+                }
+            };
 
             OrderStatus tempStatus;
-            if (Enum.TryParse<OrderStatus>(sourceOrder.Status, out tempStatus))
-            {
-                ret.Status = tempStatus;
-            }
+            // if (Enum.TryParse<OrderStatus>(sourceOrder.Status, out tempStatus))
+            // {
+            //     ret.Status = tempStatus;
+            // }
             ret.Subtotal = sourceOrder.Subtotal;
             ret.Total = sourceOrder.Total;
             ret.OrderItems = new List<OrderItem>();
@@ -260,7 +261,7 @@ namespace Infrastructure.Data
             for (int i = 0; i < sourceListPro.Count(); i++)
             {
                 var tempItem = new OrderItem();
-                tempItem.id = sourceListPro[i].uuid;
+                tempItem.Id = sourceListPro[i].uuid;
                 tempItem.ItemOrdered = new ProductItemOrdered(sourceListPro[i].ProductItemId, sourceListPro[i].ProductName, sourceListPro[i].PictureUrl);
                 tempItem.Price = sourceListPro[i].Price;
                 tempItem.Quantity = sourceListRelatation[i].Quantity;

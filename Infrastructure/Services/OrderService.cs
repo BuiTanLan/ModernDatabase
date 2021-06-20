@@ -38,8 +38,8 @@ namespace Infrastructure.Services
             var items = new List<OrderItem>();
             foreach (var item in basket.Items)
             {
-                int index = item.PictureUrl.IndexOf("images/products/");
-                string pictureUrl = item.PictureUrl.Substring(index);
+                var index = item.PictureUrl.IndexOf("images/products/", StringComparison.Ordinal);
+                var pictureUrl = item.PictureUrl[index..];
                 var productItem = await _productService.GetByIdAsync(item.Id);
                 var itemOrdered = new ProductItemOrdered(productItem._id, productItem.Name, pictureUrl);
                 var orderItem = new OrderItem(itemOrdered, productItem.Price, item.Quantity);
@@ -62,9 +62,9 @@ namespace Infrastructure.Services
             // }
 
             //create order 
-            //var order = new Order(items, buyerEmail, shippingAddress, deliveryMethod, subtotal);
-            var order = new Order();
-            order.Total = subtotal + order.DeliveryMethod.Price;
+            var order = new Order(items, buyerEmail, shippingAddress, null, subtotal);
+            // var order = new Order();
+            order.Total = subtotal;//+ order.DeliveryMethod.Price;
 
             await _orderRepository.Add(order);
             //_unitOfWork.Repository<Order>().Add(order);
@@ -154,9 +154,9 @@ namespace Infrastructure.Services
 
         public async Task<IReadOnlyList<Order>> GetOrdersForUserAsync(string buyerEmail)
         {
-            var spec = new OrdersWithItemsAndOrderingSpecification(buyerEmail);
+            //var spec = new OrdersWithItemsAndOrderingSpecification(buyerEmail);
             //return await _unitOfWork.Repository<Order>().ListAsync(spec);
-            return await _orderRepository.ListAsync(spec);
+            return await _orderRepository.ListAsync(buyerEmail);
         }
     }
 }

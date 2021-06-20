@@ -52,7 +52,6 @@ namespace Infrastructure.Services
             }
 
             var service = new PaymentIntentService();
-            PaymentIntent intent;
 
             if(string.IsNullOrEmpty(basket.PaymentIntentId))
             {
@@ -64,7 +63,7 @@ namespace Infrastructure.Services
                     PaymentMethodTypes = new List<string> { "card" }
                 };
 
-                intent = await service.CreateAsync(options);
+                var intent = await service.CreateAsync(options);
                 basket.PaymentIntentId = intent.Id;
                 basket.ClientSecret = intent.ClientSecret;
             }
@@ -84,15 +83,13 @@ namespace Infrastructure.Services
             return basket;
         }
 
-        public async Task<Core.Entities.OrderAggregate.Order> UpdateOrderPaymentFailed(string paymentIntentId)
+        public async Task<Order> UpdateOrderPaymentFailed(string paymentIntentId)
         {
             var spec = new OrderByPaymentIntentIdWithItemsSpecification(paymentIntentId);
             //var order = await _unitOfWork.Repository<Order>().GetEntityWithSpec(spec);
 
-            var order = new Order();
-            if(order == null) return null;
+            var order = new Order {Status = OrderStatus.PaymentFailed};
 
-            order.Status = OrderStatus.PaymentFailed;
             await _unitOfWork.Complete();
 
             return order;
@@ -102,14 +99,11 @@ namespace Infrastructure.Services
         {
             var spec = new OrderByPaymentIntentIdWithItemsSpecification(paymentIntentId);
             //var order = await _unitOfWork.Repository<Order>().GetEntityWithSpec(spec);
-            var order = new Order();
-            if (order == null) return null;
+            var order = new Order {Status = OrderStatus.PaymentReceived};
 
-            order.Status = OrderStatus.PaymentReceived;
             //_unitOfWork.Repository<Order>().Update(order);
 
             await _unitOfWork.Complete();
-
             return order;        
         }
     }
