@@ -23,6 +23,14 @@ export class ShopService {
   productCache = new Map();
 
   constructor(private http: HttpClient) {}
+
+  getComments(productId: string) {
+    return this.http.get(this.baseUrl + 'comment/' + productId);
+  }
+
+  postComments(content: string, productId: string) {
+    return this.http.post(this.baseUrl + 'comment', { content, productId });
+  }
   getBrand() {
     if (this.brands.length > 0) {
       return of(this.brands);
@@ -47,7 +55,7 @@ export class ShopService {
   }
 
 
-  getProduct(id: number) {
+  getProduct(id: string) {
     let product: IProduct;
     this.productCache.forEach((products: IProduct[]) => {
       console.log(product);
@@ -62,18 +70,7 @@ export class ShopService {
   }
 
 
-  getProducts(useCache: boolean) {
-    if (useCache === false) {
-      this.productCache = new Map();
-    }
-
-    if (this.productCache.size > 0 && useCache === true) {
-      if (this.productCache.has(Object.values(this.shopParams).join('-'))) {
-        this.pagination.data = this.productCache.get(Object.values(this.shopParams).join('-'));
-        return of(this.pagination);
-      }
-    }
-
+  getProducts() {
     let params = new HttpParams();
     if (this.shopParams.brandName) {
       params = params.append('brandName', this.shopParams.brandName);

@@ -13,7 +13,7 @@ namespace Core.Interfaces
     public interface IOrderRepository
     {
         Task<Order> Add(Order order);
-        Task<IReadOnlyList<Order>> ListAsync(ISpecification<OrderNeo4j> spec);
+        Task<IReadOnlyList<Order>> ListAsync(string buyerEmail);
         Task<Order> GetEntityWithSpec(ISpecification<OrderNeo4j> spec);
         Task<IReadOnlyList<DeliveryMethod>> GetDeliveryMethodsAsync();
         Task<bool> CheckUserBuyProduct(string buyerEmail, string productID);

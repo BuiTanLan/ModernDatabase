@@ -8,10 +8,10 @@ namespace Core.Entities.CommentCassandra
 {
     public class Comment
     {
-        public string userID { get; set; }
-        public string userName { get; set; }
-        public string productID { get; set; }
-        public string content { get; set; }
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public string ProductId { get; set; }
+        public string Content { get; set; }
         public DateTimeOffset CommentAt { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace Core.Entities.OrderNeo4j
             OrderDate = order.OrderDate;
             //ShipToAddress = JsonSerializer.Serialize<Address>(order.ShipToAddress);
             Subtotal = order.Subtotal;
-            Status = order.Status.ToString();
+            Status = order.Status;
             PaymentIntentId = order.PaymentIntentId;
             Total = order.Total;
         }
@@ -27,7 +27,7 @@ namespace Core.Entities.OrderNeo4j
         public DateTimeOffset OrderDate { get; set; }
         //public string ShipToAddress { get; set; }
         public decimal Subtotal { get; set; }
-        public string Status { get; set; }
+        public OrderStatus Status { get; set; }
         public string PaymentIntentId { get; set; }
         public decimal Total { get; set; }
         //public List<ProductNeo4j> pros { get; set; }
