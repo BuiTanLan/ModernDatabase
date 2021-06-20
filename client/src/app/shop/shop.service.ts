@@ -23,6 +23,14 @@ export class ShopService {
   productCache = new Map();
 
   constructor(private http: HttpClient) {}
+
+  getComments(productId: string) {
+    return this.http.get(this.baseUrl + 'comment/' + productId);
+  }
+
+  postComments(content: string, productId: string) {
+    return this.http.post(this.baseUrl + 'comment', { content, productId });
+  }
   getBrand() {
     if (this.brands.length > 0) {
       return of(this.brands);

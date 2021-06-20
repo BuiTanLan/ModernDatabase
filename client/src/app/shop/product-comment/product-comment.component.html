@@ -8,7 +8,7 @@
       </nz-comment>
     </ng-template>
   </nz-list>
-  <nz-comment>
+  <nz-comment *ngIf="(this.accountService.currentUser$ |async) !== null">
     <nz-avatar nz-comment-avatar nzIcon="user" [nzSrc]="user.avatar"></nz-avatar>
     <nz-comment-content>
       <nz-form-item>

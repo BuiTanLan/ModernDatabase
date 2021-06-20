@@ -12,6 +12,6 @@ namespace Core.Entities.CommentCassandra
         public string UserName { get; set; }
         public string ProductId { get; set; }
         public string Content { get; set; }
-        public long CommentAt { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        public DateTimeOffset CommentAt { get; set; }
     }
 }

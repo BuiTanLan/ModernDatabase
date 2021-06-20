@@ -154,9 +154,9 @@ namespace Infrastructure.Services
 
         public async Task<IReadOnlyList<Order>> GetOrdersForUserAsync(string buyerEmail)
         {
-            var spec = new OrdersWithItemsAndOrderingSpecification(buyerEmail);
+            //var spec = new OrdersWithItemsAndOrderingSpecification(buyerEmail);
             //return await _unitOfWork.Repository<Order>().ListAsync(spec);
-            return await _orderRepository.ListAsync(spec);
+            return await _orderRepository.ListAsync(buyerEmail);
         }
     }
 }

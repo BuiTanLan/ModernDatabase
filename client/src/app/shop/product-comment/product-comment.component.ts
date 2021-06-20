@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { AccountService } from 'src/app/account/account.service';
 import { IComment } from 'src/app/shared/models/comment';
+import { ShopService } from '../shop.service';
 
 @Component({
   selector: 'app-product-comment',
@@ -9,8 +10,10 @@ import { IComment } from 'src/app/shared/models/comment';
 })
 
 export class ProductCommentComponent implements OnInit {
-
-  constructor(private readonly accountService: AccountService){
+  @Input() productId: string;
+  constructor(
+    public readonly accountService: AccountService,
+    private readonly shopService: ShopService) {
   }
 
   data: IComment[] = [];
@@ -21,33 +24,62 @@ export class ProductCommentComponent implements OnInit {
   };
   inputValue = '';
 
+  formatDate(date: string): string {
+    const transter = new Date(date);
+    console.log(transter);
+    return transter.toLocaleString();
+
+  }
   handleSubmit(): void {
     this.submitting = true;
     const content = this.inputValue;
     this.inputValue = '';
-    setTimeout(() => {
+
+    this.shopService.postComments(content, this.productId).subscribe((comment: any) => {
       this.submitting = false;
-      this.data = [
-        ...this.data,
-        {
-          ...this.user,
-          content,
-          datetime: new Date(),
-          displayTime: Date.now().toString()
-        }
-      ].map(e => {
-        return {
-          ...e,
-          displayTime: Date()
-        };
-      });
-    }, 800);
+
+      return this.data = [... this.data,
+      {
+        author: comment.userName,
+        content: comment.content,
+        datetime: comment.commentAt,
+        displayTime: this.formatDate(comment.commentAt),
+        avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
+      }];
+    });
+    // setTimeout(() => {
+    //   this.data = [
+    //     ...this.data,
+    //     {
+    //       ...this.user,
+    //       content,
+    //       datetime: new Date(),
+    //       displayTime: Date.now().toString()
+    //     }
+    //   ].map(e => {
+    //     return {
+    //       ...e,
+    //       displayTime: Date()
+    //     };
+    //   });
+    // }, 800);
   }
   ngOnInit(): void {
     this.accountService.currentUser$.subscribe(user =>
       this.user.author = user.displayName);
+    this.shopService.getComments(this.productId).subscribe((comments: any) => {
+      comments.forEach((comment => {
+        this.data = [... this.data,
+        {
+          author: comment.userName,
+          content: comment.content,
+          datetime: comment.commentAt,
+          displayTime: this.formatDate(comment.commentAt),
+          avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
+        }];
+      }));
+    });
   }
 }
-
 
 

@@ -15,7 +15,7 @@ namespace Infrastructure.Data
 {
     public class OrderRepository : IOrderRepository
     {
-        public IGraphClient _client;
+        private readonly IGraphClient _client;
         public OrderRepository(IGraphClient client)
         {
             _client = client;
@@ -24,8 +24,7 @@ namespace Infrastructure.Data
         {
 
             await _client.ConnectAsync();
-            if (!_client.IsConnected)
-                return null;
+            if (!_client.IsConnected) throw new Exception();
 
             var newOrder = new OrderNeo4j(order);
            
@@ -168,31 +167,32 @@ namespace Infrastructure.Data
             return ret;
         }
 
-        public async Task<IReadOnlyList<Order>> ListAsync(ISpecification<OrderNeo4j> spec)
+        public async Task<IReadOnlyList<Order>> ListAsync(string buyerEmail)
         {
             await _client.ConnectAsync();
             if (!_client.IsConnected)
                 return null;
 
 
-            var result = await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->(pro), (ord:ORDER)-[:USE]->(method), (user:USER)-[:ARRANGE]->(ord:ORDER)")
-                                                   .Return((ord, pro, r, method, user) => new {
+            var result = await _client.Cypher.Match("(ord:ORDER)")
+                                                    .Where("ord.BuyerEmail = $email")
+                                                    .WithParams(new { email = buyerEmail})
+                                                     .Return((ord) => new {
                                                        Order = ord.As<OrderNeo4j>(),
-                                                       Method = method.As<DeliveryMethod>(),
-                                                       ContainRelated = r.CollectAs<ContainRelationshipNeo4j>(),
-                                                       Pros = pro.CollectAs<ProductNeo4j>(),
-                                                       Users = user.As<UserNeo4j>()
+                                                       //Method = method.As<DeliveryMethod>(),
+                                                       // ContainRelated = r.CollectAs<ContainRelationshipNeo4j>(),
+                                                       // Pros = pro.CollectAs<ProductNeo4j>(),
+                                                       // Users = user.As<UserNeo4j>()
                                                    })
                                                    .ResultsAsync;
-            var temp = result.ToList();
-
-            var ret = new List<Order>();
-            foreach (var i in temp)
+            var listOrder = result.Select(x => new Order
             {
-                var tempItem = mappingOrder(i.Order,i.Method,i.Users, i.ContainRelated.ToList(), i.Pros.ToList());
-                ret.Add(tempItem);
-            }
-            return ret;
+                Id =  x.Order.uuid,
+                OrderDate =  x.Order.OrderDate,
+                Total = x.Order.Total,
+                Status = x.Order.Status
+            }).ToList();
+            return listOrder;
         }
 
         public async Task<IReadOnlyList<DeliveryMethod>> GetDeliveryMethodsAsync()
@@ -231,7 +231,7 @@ namespace Infrastructure.Data
         {
             var ret = new Order
             {
-                id = sourceOrder.uuid,
+                Id = sourceOrder.uuid,
                 BuyerEmail = sourceOrder.BuyerEmail,
                 DeliveryMethod = deliveryMethod,
                 OrderDate = sourceOrder.OrderDate,
@@ -247,10 +247,10 @@ namespace Infrastructure.Data
             };
 
             OrderStatus tempStatus;
-            if (Enum.TryParse<OrderStatus>(sourceOrder.Status, out tempStatus))
-            {
-                ret.Status = tempStatus;
-            }
+            // if (Enum.TryParse<OrderStatus>(sourceOrder.Status, out tempStatus))
+            // {
+            //     ret.Status = tempStatus;
+            // }
             ret.Subtotal = sourceOrder.Subtotal;
             ret.Total = sourceOrder.Total;
             ret.OrderItems = new List<OrderItem>();
@@ -261,7 +261,7 @@ namespace Infrastructure.Data
             for (int i = 0; i < sourceListPro.Count(); i++)
             {
                 var tempItem = new OrderItem();
-                tempItem.id = sourceListPro[i].uuid;
+                tempItem.Id = sourceListPro[i].uuid;
                 tempItem.ItemOrdered = new ProductItemOrdered(sourceListPro[i].ProductItemId, sourceListPro[i].ProductName, sourceListPro[i].PictureUrl);
                 tempItem.Price = sourceListPro[i].Price;
                 tempItem.Quantity = sourceListRelatation[i].Quantity;

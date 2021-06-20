@@ -4,6 +4,7 @@ using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Data
@@ -35,27 +36,21 @@ namespace Infrastructure.Data
 
         public async Task<Comment> Add(Comment comment)
         {
-            var query = "insert into comment (userid, productid, content, commentat, username) values (?, ?, ?, ?, ?)";
+            var query = "insert into comment (userid, productid, content, commentat, username) values (?, ?, ?, toTimestamp(now()), ?)";
 
-            await ExecuteWithoutResultAsync(query, new object[] { comment.Email, comment.ProductId, comment.Content, comment.CommentAt, comment.UserName });
+            await ExecuteWithoutResultAsync(query, new object[] { comment.Email, comment.ProductId, comment.Content, comment.UserName });
 
             return comment;
         }
 
         public async Task<List<Comment>> GetAllByProduct(string product)
         {
-            var rs = await ExecuteSimpleAsync("select * from comment");
+            //var rs = await ExecuteSimpleAsync("select * from comment");
 
-           // var rs = await ExecuteSimpleAsync("select * from comment where productid = ?", new []{product});
+           var rs = await ExecuteSimpleAsync("select * from comment where productid = ?", new []{product});
 
-            var ret = new List<Comment>();
-            foreach (var row in rs)
-            {
-                var temp = Mapping(row);
-                ret.Add(temp);
-            }
-
-            return ret;
+            var ret = rs.Select(Mapping);
+            return ret.OrderBy(x => x.CommentAt).ToList();
         }
 
         public async Task<List<Comment>> GetAll()
@@ -96,7 +91,7 @@ namespace Infrastructure.Data
                 Email = row.GetValue<string>("userid"),
                 UserName = row.GetValue<string>("username"),
                 Content = row.GetValue<string>("content"),
-                CommentAt = row.GetValue<long>("commentat")
+                CommentAt = row.GetValue<DateTimeOffset>("commentat")
             };
             return temp;
         }
