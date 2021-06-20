@@ -35,9 +35,9 @@ namespace Infrastructure.Data
 
         public async Task<Comment> Add(Comment comment)
         {
-            var query = "insert into comment (userid, productid, content, commentat, username) values (?, ?, ?, toTimestamp(now()), ?)";
+            var query = "insert into comment (userid, productid, content, commentat, username) values (?, ?, ?, ?, ?)";
 
-            await ExecuteWithoutResultAsync(query, new[] { comment.Email, comment.ProductId, comment.Content, comment.UserName });
+            await ExecuteWithoutResultAsync(query, new object[] { comment.Email, comment.ProductId, comment.Content, comment.CommentAt, comment.UserName });
 
             return comment;
         }
