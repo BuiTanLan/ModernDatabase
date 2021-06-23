@@ -27,6 +27,7 @@ namespace API.Controllers
             _orderService = orderService;
             _neo4JService = neo4JService;
         }
+
         [HttpPost]
         public async Task<ActionResult<Order>> CreateOrder(OrderDto orderDto)
         {
@@ -39,17 +40,6 @@ namespace API.Controllers
             return Ok(order);
         }
 
-        //[HttpPost]
-        //public async Task<ActionResult<Order>> CreateOrder(Order orderDto)
-        //{
-        //    var email = HttpContext.User.RetrieveEmailFromPrincipal();
-        //    //var address = _mapper.Map<AddressDto, Address>(orderDto.ShipToAddress);
-        //    var order = await _orderService.CreateOrder(orderDto);
-        //    if (order == null)
-        //        return BadRequest(new ApiResponse(400, "Problem creating order"));
-        //    return Ok(order);
-        //}
-
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetOrderForUser()
         {
@@ -58,6 +48,7 @@ namespace API.Controllers
             return Ok(_mapper.Map<IReadOnlyList<Order>,IReadOnlyList<OrderToReturnDto>>(orders));
 
         }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderToReturnDto>> GetOrderByIdForUser(string id)
         {
@@ -67,12 +58,11 @@ namespace API.Controllers
             if (order == null) return NotFound(new ApiResponse(404));
             return _mapper.Map<Order, OrderToReturnDto>(order);
         }
+
         [HttpGet("deliveryMethods")]
         public async Task<ActionResult<IReadOnlyList<DeliveryMethod>>> GetDeliveryMethods()
         {
             return Ok(await _orderService.GetDeliveryMethodsAsync());
         }
-
-
     }
 }

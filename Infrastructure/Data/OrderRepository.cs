@@ -176,23 +176,42 @@ namespace Infrastructure.Data
 
             var result = await _client.Cypher.Match("(ord:ORDER)")
                                                     .Where("ord.BuyerEmail = $email")
-                                                    .WithParams(new { email = buyerEmail})
-                                                     .Return((ord) => new {
-                                                       Order = ord.As<OrderNeo4j>(),
-                                                       //Method = method.As<DeliveryMethod>(),
-                                                       // ContainRelated = r.CollectAs<ContainRelationshipNeo4j>(),
-                                                       // Pros = pro.CollectAs<ProductNeo4j>(),
-                                                       // Users = user.As<UserNeo4j>()
-                                                   })
+                                                    .WithParams(new { email = buyerEmail })
+                                                     .Return((ord) => new
+                                                     {
+                                                         Order = ord.As<OrderNeo4j>(),
+                                                         //Method = method.As<DeliveryMethod>(),
+                                                         // ContainRelated = r.CollectAs<ContainRelationshipNeo4j>(),
+                                                         // Pros = pro.CollectAs<ProductNeo4j>(),
+                                                         // Users = user.As<UserNeo4j>()
+                                                     })
                                                    .ResultsAsync;
             var listOrder = result.Select(x => new Order
             {
-                Id =  x.Order.uuid,
-                OrderDate =  x.Order.OrderDate,
+                Id = x.Order.uuid,
+                OrderDate = x.Order.OrderDate,
                 Total = x.Order.Total,
                 Status = x.Order.Status
             }).ToList();
             return listOrder;
+            //var result = await _client.Cypher.Match("(ord:ORDER)-[r:CONTAIN]->(pro), (ord:ORDER)-[:USE]->(method), (user:USER)-[:ARRANGE]->(ord:ORDER)")
+            //                           .Return((ord, pro, r, method, user) => new {
+            //                               Order = ord.As<OrderNeo4j>(),
+            //                               Method = method.As<DeliveryMethod>(),
+            //                               ContainRelated = r.CollectAs<ContainRelationshipNeo4j>(),
+            //                               Pros = pro.CollectAs<ProductNeo4j>(),
+            //                               Users = user.As<UserNeo4j>()
+            //                           })
+            //                           .ResultsAsync;
+            //var temp = result.ToList();
+
+            //var ret = new List<Order>();
+            //foreach (var i in temp)
+            //{
+            //    var tempItem = mappingOrder(i.Order, i.Method, i.Users, i.ContainRelated.ToList(), i.Pros.ToList());
+            //    ret.Add(tempItem);
+            //}
+            //return ret;
         }
 
         public async Task<IReadOnlyList<DeliveryMethod>> GetDeliveryMethodsAsync()
