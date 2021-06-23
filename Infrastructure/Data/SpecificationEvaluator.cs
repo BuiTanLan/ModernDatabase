@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using System.Linq.Expressions;
 using Core.Entities;
 using Core.Specifications;
 using Microsoft.EntityFrameworkCore;
@@ -36,29 +38,25 @@ namespace Infrastructure.Data
     {
         public static IFindFluent<TEntity, TEntity> GetQuery(IMongoCollection<TEntity> inputQuery, ISpecification<TEntity> spec)
         {
-            var query = inputQuery;
-            var temp = spec.Criteria;
-            if (temp == null)
+            IFindFluent<TEntity, TEntity> query = null;
+            if (spec.Criteria != null)
             {
-                temp = (_ => true);
+                query = inputQuery.Find(spec.Criteria);
             }
-            var ret = inputQuery.Find(temp);
 
             if (spec.OrderBy != null)
             {
-                ret = ret.SortBy(spec.OrderBy);
+                query = query.SortBy(spec.OrderBy);
             }
             if (spec.OrderByDescending != null)
             {
-                ret = ret.SortByDescending(spec.OrderByDescending);
+                query = query.SortByDescending(spec.OrderByDescending);
             }
-            if (spec.IsPagingEnabled)
-            {
-                ret = ret.Skip(spec.Skip).Limit(spec.Take);
-            }
+            if (!spec.IsPagingEnabled) return query;
+            query = query?.Skip(spec.Skip).Limit(spec.Take);
             //query = spec.Includes.Aggregate(query, (current, include) => current.Include(include));
 
-            return ret;
+            return query;
         }
     }
 }

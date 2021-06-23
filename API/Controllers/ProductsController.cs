@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using API.Dtos;
 using API.Errors;
@@ -25,43 +24,49 @@ namespace API.Controllers
     public class ProductsController : BaseApiController
     {
         private readonly IPhotoService _photoService;
-        private readonly IGraphClient _neo4JService;
         private readonly IMapper _mapper;
-        private readonly IOrderRepository _orderRepository;
         private readonly IProductService _productService;
-        public ProductsController(IOrderRepository orderRepository, IMapper mapper, IPhotoService photoService, IProductService productService, IGraphClient neo4JService)
+        public ProductsController(IMapper mapper, IPhotoService photoService, IProductService productService)
         {
             _photoService = photoService;
-            _orderRepository = orderRepository;
             _mapper = mapper;
             _productService = productService;
-            _neo4JService = neo4JService;
         }
 
 
         [Cached(600)]
         [HttpGet]
-        public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts(
-            [FromQuery] ProductSpecParams productParams)
-        {
-            var spec = new ProductsWithTypesAndBrandsSpecification(productParams);
-            var countSpec = new ProductWithFiltersForCountSpecification(productParams);
-            //var totalItems = await _unitOfWork.Repository<Product>().CountAsync(countSpec);
-            var totalItems = await _productService.CountAsync(countSpec);
-            //var products = await _unitOfWork.Repository<Product>().ListAsync(spec);
-            var products = await _productService.ListAsync(spec);
+        // public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts(
+        //     [FromQuery] ProductSpecParams productParams)
+        // {
+        //     var spec = new ProductsWithTypesAndBrandsSpecification(productParams);
+        //     var countSpec = new ProductWithFiltersForCountSpecification(productParams);
+        //     //var totalItems = await _unitOfWork.Repository<Product>().CountAsync(countSpec);
+        //     var totalItems = await _productService.CountAsync(countSpec);
+        //     //var products = await _unitOfWork.Repository<Product>().ListAsync(spec);
+        //     var products = await _productService.ListAsync(spec);
+        //
+        //     var data = _mapper
+        //         .Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDto>>(products);
+        //     return Ok(new Pagination<ProductToReturnDto>(productParams.PageIndex,
+        //     productParams.PageSize, totalItems, data));
+        // }
 
+        [HttpGet()]
+        public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetAllProductAsync([FromQuery] ProductSpecParams param)
+        {
+            var result = await _productService.GetAllProductAsync(param);
             var data = _mapper
-                .Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDto>>(products);
-            return Ok(new Pagination<ProductToReturnDto>(productParams.PageIndex,
-            productParams.PageSize, totalItems, data));
+                     .Map<List<Product>, List<ProductToReturnDto>>(result.Item1);
+                 return Ok(new Pagination<ProductToReturnDto>(param.PageIndex,
+                param.PageSize, result.Item2, data));
         }
 
 
         [Cached(600)]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)] 
         public async Task<ActionResult<ProductToReturnDto>> GetProduct(string id)
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
@@ -103,10 +108,10 @@ namespace API.Controllers
         {
             var product = _mapper.Map<ProductCreateDto, Product>(productToCreate);
             product.ProductBrand = new ProductBrand();
-            product.ProductBrand._id = productToCreate.ProductBrandId;
+            product.ProductBrand.Id = productToCreate.ProductBrandId;
 
             product.ProductType = new ProductType();
-            product.ProductType._id = productToCreate.ProductTypeId;
+            product.ProductType.Id = productToCreate.ProductTypeId;
 
             try
             {
@@ -263,10 +268,10 @@ namespace API.Controllers
         }
 
 
-        [HttpPost("exec/{command}")]
-        public async Task<IActionResult> Exec([FromBody] Order order)
-        {
-            return Ok(await _orderRepository.Add(order));
-        }
+        // [HttpPost("exec/{command}")]
+        // public async Task<IActionResult> Exec([FromBody] Order order)
+        // {
+        //     return Ok(await _orderRepository.Add(order));
+        // }
     }
 }
