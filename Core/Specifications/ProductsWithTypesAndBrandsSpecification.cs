@@ -5,20 +5,12 @@ namespace Core.Specifications
     public class ProductsWithTypesAndBrandsSpecification : BaseSpecification<Product>
     {
         public ProductsWithTypesAndBrandsSpecification(ProductSpecParams productParams)
-            : base(null)
+            : base(x =>
+                string.IsNullOrWhiteSpace(productParams.Search) || x.Name.ToLower().Contains(productParams.Search))
+                // (productParams.BrandName == "all" || x.ProductBrand.Name.ToLower() == productParams.BrandName) &&
+                // (productParams.TypeName == "all" || x.ProductType.Name.ToLower() == productParams.TypeName))
         {
-            if (!string.IsNullOrEmpty(productParams.Search))
-            {
-                SetCriteria(x =>
-                    (string.IsNullOrEmpty(productParams.Search) || x.Name.ToLower().Contains
-                    (productParams.Search)) &&
-                    (productParams.BrandName == "all" || x.ProductBrand.Name.ToLower() == productParams.BrandName) &&
-                    (productParams.TypeName == "all" || x.ProductType.Name.ToLower() == productParams.TypeName));
-            }
-            //AddIncluded(x => x.ProductType);
-            //AddIncluded(x => x.ProductBrand);
-            //AddIncluded(x => x.Photos);
-            
+
             AddOrderBy(x => x.Name);
             ApplyPaging(productParams.PageSize * (productParams.PageIndex - 1), productParams.PageSize); 
             if (!string.IsNullOrEmpty(productParams.Sort))
@@ -37,7 +29,7 @@ namespace Core.Specifications
                 }
             }
         }
-        public ProductsWithTypesAndBrandsSpecification(string id) : base(x => x._id == id)
+        public ProductsWithTypesAndBrandsSpecification(string id) : base(x => x.Id == id)
         {
             //AddIncluded(x => x.ProductType);
             //AddIncluded(x => x.ProductBrand);

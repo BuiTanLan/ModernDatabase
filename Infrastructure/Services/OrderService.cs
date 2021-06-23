@@ -41,7 +41,7 @@ namespace Infrastructure.Services
                 var index = item.PictureUrl.IndexOf("images/products/", StringComparison.Ordinal);
                 var pictureUrl = item.PictureUrl[index..];
                 var productItem = await _productService.GetByIdAsync(item.Id);
-                var itemOrdered = new ProductItemOrdered(productItem._id, productItem.Name, pictureUrl);
+                var itemOrdered = new ProductItemOrdered(productItem.Id, productItem.Name, pictureUrl);
                 var orderItem = new OrderItem(itemOrdered, productItem.Price, item.Quantity);
                 items.Add(orderItem);
             }

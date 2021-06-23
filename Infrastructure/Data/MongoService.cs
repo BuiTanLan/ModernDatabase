@@ -11,41 +11,17 @@ namespace Infrastructure.Data
     public class MongoDbService
     {
         private readonly IMongoDatabase _mongoDb;
-        private readonly AppSettings _appSettings;
-        public MongoClient _client;
-
-
         public MongoDbService(IOptions<AppSettings> appSettings)
         {
-            _appSettings = appSettings.Value;
-
-            _client = new MongoClient(_appSettings.MongoConnectionString);
-            _mongoDb = _client.GetDatabase(_appSettings.MongoDatabase);
+            var mongoSetting = appSettings.Value;
+            var client = new MongoClient(mongoSetting.MongoConnectionString);
+            _mongoDb = client.GetDatabase(mongoSetting.MongoDatabase);
         }
+        public IMongoCollection<Product> Products => _mongoDb.GetCollection<Product>("Product");
 
-        public IMongoCollection<Product> Product
-        {
-            get
-            {
-                return _mongoDb.GetCollection<Product>("Product");
-            }
-        }
+        public IMongoCollection<ProductBrand> ProductBrands => _mongoDb.GetCollection<ProductBrand>("ProductBrand");
 
-        public IMongoCollection<ProductBrand> ProductBrand
-        {
-            get
-            {
-                return _mongoDb.GetCollection<ProductBrand>("ProductBrand");
-            }
-        }
-
-        public IMongoCollection<ProductType> ProductType
-        {
-            get
-            {
-                return _mongoDb.GetCollection<ProductType>("ProductType");
-            }
-        }
+        public IMongoCollection<ProductType> ProductTypes => _mongoDb.GetCollection<ProductType>("ProductType");
     }
 
 }

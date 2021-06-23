@@ -11,14 +11,6 @@ namespace Core.Entities
         {
             _photos = new List<Photo>();
         }
-
-        //public Product(ProductNeo4j)
-        //{
-
-        //}
-        //[BsonId]
-        //[BsonRepresentation(BsonType.ObjectId)]
-        //public string _id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
@@ -27,8 +19,8 @@ namespace Core.Entities
         //public int ProductTypeId { get; set; }
         public ProductBrand ProductBrand { get; set; }
         //public int ProductBrandId { get; set; }
-        public List<Photo> _photos { get; set; }
-        public IReadOnlyList<Photo> Photos => _photos.AsReadOnly();
+        private readonly List<Photo> _photos;
+        public List<Photo> Photos { get; set; }
 
         public void AddPhoto(string pictureUrl, string fileName, bool isMain = false)
         {

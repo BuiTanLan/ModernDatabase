@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Entities.OrderAggregate;
@@ -21,6 +22,8 @@ namespace Core.Interfaces
         Task Update(Product entity);
         Task Delete(Product entity);
         Task<List<Product>> GetRecommendedProduct(string id);
+        Task<Tuple<List<Product>, int>> GetAllProductAsync(ProductSpecParams param);
+
 
     }
 }

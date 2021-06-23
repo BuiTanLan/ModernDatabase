@@ -9,7 +9,8 @@ namespace Core.Specifications
         public BaseSpecification()
         {
         }
-        public BaseSpecification(Expression<Func<T, bool>> criteria)
+
+        protected BaseSpecification(Expression<Func<T, bool>> criteria)
         {
             Criteria = criteria;
         }
@@ -25,11 +26,7 @@ namespace Core.Specifications
         public int Skip { get; private set; }
 
         public bool IsPagingEnabled { get; private set; }
-
-        protected void SetCriteria(Expression<Func<T, bool>> criteria)
-        {
-            Criteria = criteria;
-        }
+        
 
         protected void AddIncluded(Expression<Func<T,object>> includeExpression)
         {

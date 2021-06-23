@@ -6,7 +6,6 @@ using Core.Entities;
 using Core.Entities.OrderNeo4j;
 using Core.Interfaces;
 using Core.Specifications;
-using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using Neo4jClient;
 
@@ -17,7 +16,11 @@ namespace Infrastructure.Data
         private readonly MongoDbService _mongoDbService;
         private readonly IGraphClient _client;
         private readonly ICommentRepository _commentRepository;
-        public ProductRepository(MongoDbService mongoDbService, IGraphClient client, ICommentRepository commentRepository)
+        public ProductRepository(
+            MongoDbService mongoDbService, 
+            IGraphClient client, 
+            ICommentRepository commentRepository      
+            )
         {
             _mongoDbService = mongoDbService;
             _client = client;
@@ -26,27 +29,27 @@ namespace Infrastructure.Data
 
         public async Task<IReadOnlyList<ProductBrand>> GetProductBrandsAsync()
         {
-            var ret = await _mongoDbService.ProductBrand.Find(_ => true).ToListAsync();
+            var ret = await _mongoDbService.ProductBrands.Find(_ => true).ToListAsync();
 
             return ret;
         }
 
         public async Task<Product> GetProductByIdAsync(string id)
         {
-            var filter = Builders<Product>.Filter.Eq(e => e._id, id);
-            var ret = await _mongoDbService.Product.Find(filter).SingleOrDefaultAsync();
+            var filter = Builders<Product>.Filter.Eq(e => e.Id, id);
+            var ret = await _mongoDbService.Products.Find(filter).SingleOrDefaultAsync();
             return ret;
         }
 
         public async Task<IReadOnlyList<Product>> GetProductsAsync()
         {
-            var ret = await _mongoDbService.Product.Find(_ => true).ToListAsync();
+            var ret = await _mongoDbService.Products.Find(_ => true).ToListAsync();
             return ret;
         }
 
         public async Task<IReadOnlyList<ProductType>> GetProductTypesAsync()
         {
-            var ret = await _mongoDbService.ProductType.Find(_ => true).ToListAsync();
+            var ret = await _mongoDbService.ProductTypes.Find(_ => true).ToListAsync();
             return ret;
         }
 
@@ -56,18 +59,18 @@ namespace Infrastructure.Data
             if (!_client.IsConnected)
                 return;
 
-            var type = await _mongoDbService.ProductType.Find(e => e._id == entity.ProductType._id).SingleOrDefaultAsync();
+            var type = await _mongoDbService.ProductTypes.Find(e => e.Id == entity.ProductType.Id).SingleOrDefaultAsync();
             if (type == null)
                 return;
 
-            var brand = await _mongoDbService.ProductBrand.Find(e => e._id == entity.ProductBrand._id).SingleOrDefaultAsync();
+            var brand = await _mongoDbService.ProductBrands.Find(e => e.Id == entity.ProductBrand.Id).SingleOrDefaultAsync();
             if (brand == null)
                 return;
 
             entity.ProductBrand.Name = brand.Name;
             entity.ProductType.Name = type.Name;
 
-            await _mongoDbService.Product.InsertOneAsync(entity);
+            await _mongoDbService.Products.InsertOneAsync(entity);
 
 
             //var result = await _client.Cypher.Merge("(pro:PRODUCT {ProductItemId: id})")
@@ -88,14 +91,14 @@ namespace Infrastructure.Data
                                                  .ResultsAsync;
                 if (result == null)
                 {
-                    var filter = Builders<Product>.Filter.Eq(e => e._id, entity._id);
-                    await _mongoDbService.Product.DeleteOneAsync(filter);
+                    var filter = Builders<Product>.Filter.Eq(e => e.Id, entity.Id);
+                    await _mongoDbService.Products.DeleteOneAsync(filter);
                 }
             }
             catch(Exception ex)
             {
-                var filter = Builders<Product>.Filter.Eq(e => e._id, entity._id);
-                await _mongoDbService.Product.DeleteOneAsync(filter);
+                var filter = Builders<Product>.Filter.Eq(e => e.Id, entity.Id);
+                await _mongoDbService.Products.DeleteOneAsync(filter);
                 return;
             }
 
@@ -104,15 +107,15 @@ namespace Infrastructure.Data
 
         public async Task<int> CountAsync(ISpecification<Product> spec)
         {
-            var temp1 = ApplySpecification(spec);
-            var temp = await temp1.ToListAsync();
-            return temp.Count();
+            var listProduct =  await ApplySpecification(spec).ToListAsync();
+            if (listProduct != null) return listProduct.Count;
+            return 0;
         }
 
         public async Task Delete(Product entity)
         {
-            var filter = Builders<Product>.Filter.Eq(e => e._id, entity._id);
-            var delResult = await _mongoDbService.Product.DeleteOneAsync(filter);
+            var filter = Builders<Product>.Filter.Eq(e => e.Id, entity.Id);
+            var delResult = await _mongoDbService.Products.DeleteOneAsync(filter);
 
             try
             {
@@ -120,32 +123,32 @@ namespace Infrastructure.Data
                        .Where("pro.ProductItemId = $id")
                        .Set("pro.IsDeleted = 1")
                        .Delete("r")
-                       .WithParams(new { id = entity._id })
+                       .WithParams(new { id = entity.Id })
                        .Return(pro => pro.As<ProductNeo4j>().uuid)
                        .ResultsAsync;
 
                 var temp = result.Single();
                 if (temp == null)
                 {
-                    await _mongoDbService.Product.InsertOneAsync(entity);
+                    await _mongoDbService.Products.InsertOneAsync(entity);
                     return;
                 }
 
                 //try
                 //{
-                    await _commentRepository.DeleteMany(entity._id);
+                    await _commentRepository.DeleteMany(entity.Id);
                 //}
             }
             catch (Exception ex)
             {
-                await _mongoDbService.Product.InsertOneAsync(entity);
+                await _mongoDbService.Products.InsertOneAsync(entity);
             }
         }
 
         public async Task<Product> GetByIdAsync(string _id)
         {
-            var filter = Builders<Product>.Filter.Eq(e => e._id, _id);
-            var ret = await _mongoDbService.Product.Find(filter).SingleOrDefaultAsync();
+            var filter = Builders<Product>.Filter.Eq(e => e.Id, _id);
+            var ret = await _mongoDbService.Products.Find(filter).SingleOrDefaultAsync();
             return ret;
         }
 
@@ -156,7 +159,7 @@ namespace Infrastructure.Data
 
         public async Task<IReadOnlyList<Product>> ListAllAsync()
         {
-            var ret = await _mongoDbService.Product.Find(_ => true).ToListAsync();
+            var ret = await _mongoDbService.Products.Find(_ => true).ToListAsync();
             return ret;
         }
 
@@ -167,32 +170,32 @@ namespace Infrastructure.Data
 
         public async Task Update(Product entity)
         {
-            var filter = Builders<Product>.Filter.Eq(e => e._id, entity._id);
-            var backupProduct = await _mongoDbService.Product.Find(filter).SingleOrDefaultAsync();
+            var filter = Builders<Product>.Filter.Eq(e => e.Id, entity.Id);
+            var backupProduct = await _mongoDbService.Products.Find(filter).SingleOrDefaultAsync();
             try
             {
 
-                await _mongoDbService.Product.ReplaceOneAsync(filter, entity);
+                await _mongoDbService.Products.ReplaceOneAsync(filter, entity);
 
                 var updatedProduct = new ProductNeo4j(entity);
 
                 var result = await _client.Cypher.Match("(pro:PRODUCT)")
                                                    .Where("pro.ProductItemId = $id")
                                                    .Set("pro = $product")
-                                                   .WithParams(new { id = entity._id, product = updatedProduct })
+                                                   .WithParams(new { id = entity.Id, product = updatedProduct })
                                                    .Return(pro => pro.As<ProductNeo4j>().uuid)
                                                    .ResultsAsync;
 
                 var temp = result.Single();
                 if (temp == null)
                 {
-                    await _mongoDbService.Product.ReplaceOneAsync(filter, backupProduct);
+                    await _mongoDbService.Products.ReplaceOneAsync(filter, backupProduct);
                     return;
                 }
             }
             catch (Exception ex)
             {
-                await _mongoDbService.Product.ReplaceOneAsync(filter, backupProduct);
+                await _mongoDbService.Products.ReplaceOneAsync(filter, backupProduct);
             }
         }
 
@@ -220,7 +223,7 @@ namespace Infrastructure.Data
                     {
                         var idList = temp.Select(e => e.Recommendation).ToList();
 
-                        var productInList = await _mongoDbService.Product.Find(e => idList.Contains(e._id)).ToListAsync();
+                        var productInList = await _mongoDbService.Products.Find(e => idList.Contains(e.Id)).ToListAsync();
 
                         return productInList;
                     }
@@ -235,7 +238,16 @@ namespace Infrastructure.Data
 
         private IFindFluent<Product, Product> ApplySpecification(ISpecification<Product> spec)
         {
-            return SpecificationEvaluatorMongo<Product>.GetQuery(_mongoDbService.Product, spec);
+            return SpecificationEvaluatorMongo<Product>.GetQuery(_mongoDbService.Products, spec);
+        }
+        public async Task<List<Product>> GetAllProductAsync(ProductSpecParams param)
+        {
+            var result  = await _mongoDbService.Products.Find( f => true).ToListAsync();
+            var listProduct = result.Where(x =>
+                (string.IsNullOrEmpty(param.Search) || x.Name.ToLower().Contains(param.Search))
+                && (param.BrandName == "all"  || x.ProductBrand.Name.ToLower() == param.BrandName)
+                && (param.TypeName == "all" || x.ProductType.Name.ToLower() == param.TypeName)).ToList();
+            return listProduct;
         }
     }
 }
