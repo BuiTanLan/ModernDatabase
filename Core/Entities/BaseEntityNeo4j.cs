@@ -6,6 +6,6 @@ namespace Core.Entities
 {
     public class BaseEntityNeo4j
     {
-        public string id { get; set; }
+        public string Id { get; set; }
     }
 }

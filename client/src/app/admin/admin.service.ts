@@ -15,15 +15,15 @@ export class AdminService {
     return this.http.post(this.baseUrl + 'products', product);
   }
 
-  updateProduct(product: ProductFormValues, id: number) {
+  updateProduct(product: ProductFormValues, id: string) {
     return this.http.put(this.baseUrl + 'products/' + id, product);
   }
 
-  deleteProduct(id: number) {
+  deleteProduct(id: string) {
     return this.http.delete(this.baseUrl + 'products/' + id);
   }
 
-    uploadImage(file: File, id: number) {
+    uploadImage(file: File, id: string) {
     const formData = new FormData();
     formData.append('photo', file, 'image.png');
     return this.http.put(this.baseUrl + 'products/' + id + '/photo', formData, {
@@ -32,11 +32,11 @@ export class AdminService {
     });
   }
 
-  deleteProductPhoto(photoId: number, productId: number) {
+  deleteProductPhoto(photoId: number, productId: string) {
     return this.http.delete(this.baseUrl + 'products/' + productId + '/photo/' + photoId);
   }
 
-  setMainPhoto(photoId: number, productId: number) {
+  setMainPhoto(photoId: number, productId: string) {
     return this.http.post(this.baseUrl + 'products/' + productId + '/photo/' + photoId, {});
   }
 

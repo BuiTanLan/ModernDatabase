@@ -10,7 +10,7 @@ export interface IBasket {
 }
 
 export interface IBasketItem {
-  id: number;
+  id: string;
   productName: string;
   price: number;
   quantity: number;

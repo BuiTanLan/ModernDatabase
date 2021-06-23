@@ -65,7 +65,7 @@ export class ProductsDetailsComponent implements OnInit {
     }
   }
   loadProduct() {
-    this.shopService.getProduct(+this.activatedRoute.snapshot.paramMap.get('id')).subscribe(product => {
+    this.shopService.getProduct(this.activatedRoute.snapshot.paramMap.get('id')).subscribe(product => {
       this.product = product;
       this.bcService.set('@productDetails', product.name);
       this.initializeGallery();

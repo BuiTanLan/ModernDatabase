@@ -19,12 +19,12 @@ namespace Infrastructure.Services
 
         public async Task<Comment> AddComment(Comment comment)
         {
-            if (await _orderRepo.CheckUserBuyProduct(comment.userName, comment.productID))
-            {
-                return await _commentRepo.Add(comment);
-            }
-
-            throw new Exception("User has not bought this item");
+            // if (await _orderRepo.CheckUserBuyProduct(comment.UserName, comment.ProductId))
+            // {
+            //     
+            // }
+            return await _commentRepo.Add(comment);
+            //throw new Exception("User has not bought this item");
         }
 
         public Task<List<Comment>> GetAllCommentsByProduct(string productID)

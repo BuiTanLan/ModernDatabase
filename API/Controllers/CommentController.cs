@@ -40,21 +40,18 @@ namespace API.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> AddComment([FromBody] Comment comment)
+        public async Task<IActionResult> AddComment([FromBody] CommentRequestDto commentDto)
         {
-            try
+            var user = await _userManager.FindByUserByClaimsPrincipleWithAddressAsync(HttpContext.User);
+            var comment = new Comment
             {
-                var user = await _userManager.FindByUserByClaimsPrincipleWithAddressAsync(HttpContext.User);
-                if (user == null) return BadRequest("user null");
+                Email = user.Email,
+                UserName = user.DisplayName,
+                Content = commentDto.Content,
+                ProductId = commentDto.ProductId
+            };
+            return Ok(await _commentService.AddComment(comment));
 
-                comment.userName = user.Email;
-
-                return Ok(await _commentService.AddComment(comment));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
-            }
         }
     }
 
