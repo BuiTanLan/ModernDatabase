@@ -103,7 +103,7 @@ namespace API.Controllers
 
 
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Product>> CreateProduct(ProductCreateDto productToCreate)
         {
             var product = _mapper.Map<ProductCreateDto, Product>(productToCreate);
@@ -128,7 +128,7 @@ namespace API.Controllers
 
 
         [HttpPut("{id}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Product>> UpdateProduct(string id, ProductToUpdatedDto productToUpdate)
         {
             var product = await _productService.GetByIdAsync(id);
@@ -184,7 +184,7 @@ namespace API.Controllers
 
 
         [HttpPut("{id}/photo")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ProductToReturnDto>> AddProductPhoto(string id, [FromForm] ProductPhotoDto photoDto)
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
