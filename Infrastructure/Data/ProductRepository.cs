@@ -114,6 +114,10 @@ namespace Infrastructure.Data
 
         public async Task Delete(Product entity)
         {
+            await _client.ConnectAsync();
+            if (!_client.IsConnected)
+                return;
+
             var filter = Builders<Product>.Filter.Eq(e => e.Id, entity.Id);
             var delResult = await _mongoDbService.Products.DeleteOneAsync(filter);
 
@@ -170,21 +174,54 @@ namespace Infrastructure.Data
 
         public async Task Update(Product entity)
         {
+            await _client.ConnectAsync();
+            if (!_client.IsConnected)
+                return;
+
             var filter = Builders<Product>.Filter.Eq(e => e.Id, entity.Id);
             var backupProduct = await _mongoDbService.Products.Find(filter).SingleOrDefaultAsync();
             try
             {
+                var type = await _mongoDbService.ProductTypes.Find(e => e.Id == entity.ProductType.Id).SingleOrDefaultAsync();
+                if (type == null)
+                    return;
+
+                var brand = await _mongoDbService.ProductBrands.Find(e => e.Id == entity.ProductBrand.Id).SingleOrDefaultAsync();
+                if (brand == null)
+                    return;
+
+                entity.ProductBrand.Name = brand.Name;
+                entity.ProductType.Name = type.Name;
 
                 await _mongoDbService.Products.ReplaceOneAsync(filter, entity);
 
                 var updatedProduct = new ProductNeo4j(entity);
 
-                var result = await _client.Cypher.Match("(pro:PRODUCT)")
-                                                   .Where("pro.ProductItemId = $id")
-                                                   .Set("pro = $product")
-                                                   .WithParams(new { id = entity.Id, product = updatedProduct })
-                                                   .Return(pro => pro.As<ProductNeo4j>().uuid)
-                                                   .ResultsAsync;
+                var query = _client.Cypher.Match("(pro:PRODUCT)")
+                                           .Where("pro.ProductItemId = $id");
+                if (backupProduct.Photos.Count() != entity.Photos.Count)
+                {
+                    query = query.Set("pro.Price = $price, pro.ProductName = $name, pro.PictureUrl = $url")
+                                .WithParams(new
+                                {
+                                    id = entity.Id,
+                                    price = entity.Price.ToString(),
+                                    name = updatedProduct.ProductName,
+                                    url = updatedProduct.PictureUrl
+                                });
+                }
+                else
+                {
+                    query = query.Set("pro.Price = $price, pro.ProductName = $name")
+                                .WithParams(new
+                                {
+                                    id = entity.Id,
+                                    price = entity.Price.ToString(),
+                                    name = updatedProduct.ProductName
+                                });
+                }
+
+                var result = await query.Return(pro => pro.As<ProductNeo4j>().uuid).ResultsAsync;
 
                 var temp = result.SingleOrDefault();
                 if (temp == null)

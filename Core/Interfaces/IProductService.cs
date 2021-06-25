@@ -23,7 +23,5 @@ namespace Core.Interfaces
         Task Delete(Product entity);
         Task<List<Product>> GetRecommendedProduct(string id);
         Task<Tuple<List<Product>, int>> GetAllProductAsync(ProductSpecParams param);
-
-
     }
 }

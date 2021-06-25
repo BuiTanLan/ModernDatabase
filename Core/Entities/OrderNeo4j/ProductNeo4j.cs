@@ -10,12 +10,17 @@ namespace Core.Entities.OrderNeo4j
         {
 
         }
-        public ProductNeo4j(Product product)
+        public ProductNeo4j(Product product, string Url=null)
         {
             uuid = Guid.NewGuid().ToString();
             ProductItemId = product.Id;
             ProductName = product.Name;
-            PictureUrl = product.Photos.Where(e => e.IsMain).Select(e => e.PictureUrl).SingleOrDefault();
+            if (product.Photos != null)
+                PictureUrl = product.Photos.Where(e => e.IsMain).Select(e => e.PictureUrl).SingleOrDefault();
+            else
+            {
+                PictureUrl = Url;
+            }
             Price = product.Price;
         }
         public string uuid { get; set; }

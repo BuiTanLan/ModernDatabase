@@ -9,7 +9,7 @@ namespace Core.Entities
     {
         public Product()
         {
-            _photos = new List<Photo>();
+            Photos = new List<Photo>();
         }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -30,26 +30,29 @@ namespace Core.Entities
                 PictureUrl = pictureUrl
             };
 
-            if(_photos.Count == 0) photo.IsMain = true;
+            if(Photos.Count == 0) photo.IsMain = true;
 
-            _photos.Add(photo);
+            if (Photos == null)
+                Photos = new List<Photo>();
+
+            Photos.Add(photo);
         }
 
         public void RemovePhoto(int id)
         { 
-            var photo = _photos.Find(x => x.Id == id);
-            _photos.Remove(photo);
+            var photo = Photos.Find(x => x.Id == id);
+            Photos.Remove(photo);
         }
 
         public void SetMainPhoto(int id)
         {
-            var currentMain = _photos.SingleOrDefault(x => x.IsMain);
-            foreach (var item in _photos.Where(item => item.IsMain))
+            var currentMain = Photos.SingleOrDefault(x => x.IsMain);
+            foreach (var item in Photos.Where(item => item.IsMain))
             { 
                 item.IsMain = false;
             }
 
-            var photo = _photos.Find(x => x.Id == id);
+            var photo = Photos.Find(x => x.Id == id);
             if (photo != null)
             {
                 photo.IsMain = true;
