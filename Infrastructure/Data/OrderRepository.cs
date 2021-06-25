@@ -61,7 +61,7 @@ namespace Infrastructure.Data
                                                   .Return(r => r.As<string>())
                                                   .ResultsAsync;
 
-                    if (ret.Single() == null)
+                    if (ret.SingleOrDefault() == null)
                     {
                         await _client.Cypher.Match("(ord:ORDER)-[r]->()")
                                             .Where<OrderNeo4j>(ord => ord.uuid == tempId)
@@ -77,7 +77,7 @@ namespace Infrastructure.Data
                                                       .Return(r => r.As<string>())
                                                       .ResultsAsync;
 
-                    if (retUser.Single() == null)
+                    if (retUser.SingleOrDefault() == null)
                     {
                         await _client.Cypher.Match("(ord:ORDER)-[r]->()")
                                             .Where<OrderNeo4j>(ord => ord.uuid == tempId)
@@ -102,7 +102,8 @@ namespace Infrastructure.Data
                                                           })
                                                           .Return(r => r.As<ContainRelationshipNeo4j>())
                                                           .ResultsAsync;
-                        if (result1.Single() == null)
+
+                        if (result1.SingleOrDefault() == null)
                         {
                             await _client.Cypher.Match("(ord:ORDER)-[r]->()")
                                                 .Where<OrderNeo4j>(ord => ord.uuid == tempId)
@@ -121,7 +122,7 @@ namespace Infrastructure.Data
                                                           })
                                                           .Return(r => r.As<string>())
                                                           .ResultsAsync;
-                        if (result2.Single() == null)
+                        if (result2.SingleOrDefault() == null)
                         {
                             await _client.Cypher.Match("(ord:ORDER)-[r]->()")
                                                 .Where<OrderNeo4j>(ord => ord.uuid == tempId)
@@ -159,7 +160,11 @@ namespace Infrastructure.Data
                                                        Users = user.As<UserNeo4j>()
                                                    })
                                                    .ResultsAsync;
-            var temp = result.Single();
+
+            //if (result.Count() == 0)
+            //    return null;
+
+            var temp = result.SingleOrDefault();
             if (temp == null)
                 return null;
 
@@ -179,7 +184,7 @@ namespace Infrastructure.Data
                                                     .WithParams(new { email = buyerEmail })
                                                      .Return((ord) => new
                                                      {
-                                                         Order = ord.As<OrderNeo4j>(),
+                                                         Order = ord.As<OrderNeo4j>()
                                                          //Method = method.As<DeliveryMethod>(),
                                                          // ContainRelated = r.CollectAs<ContainRelationshipNeo4j>(),
                                                          // Pros = pro.CollectAs<ProductNeo4j>(),
@@ -189,6 +194,7 @@ namespace Infrastructure.Data
             var listOrder = result.Select(x => new Order
             {
                 Id = x.Order.uuid,
+                BuyerEmail = x.Order.BuyerEmail,
                 OrderDate = x.Order.OrderDate,
                 Total = x.Order.Total,
                 Status = x.Order.Status
@@ -237,7 +243,7 @@ namespace Infrastructure.Data
                                               .WithParams(new { email = buyerEmail, mongoID = productID })
                                               .Return(user => user.As<UserNeo4j>().BuyerEmail)
                                               .ResultsAsync;
-            var temp = result2.Single();
+            var temp = result2.SingleOrDefault();
             return (temp != null);
         }
 

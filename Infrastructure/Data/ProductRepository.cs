@@ -89,7 +89,7 @@ namespace Infrastructure.Data
                                                  .WithParams(new { newProduct = tempProduct })
                                                  .Return(pro => pro.As<ProductNeo4j>().uuid)
                                                  .ResultsAsync;
-                if (result == null)
+                if (result.SingleOrDefault() == null)
                 {
                     var filter = Builders<Product>.Filter.Eq(e => e.Id, entity.Id);
                     await _mongoDbService.Products.DeleteOneAsync(filter);
@@ -127,7 +127,7 @@ namespace Infrastructure.Data
                        .Return(pro => pro.As<ProductNeo4j>().uuid)
                        .ResultsAsync;
 
-                var temp = result.Single();
+                var temp = result.SingleOrDefault();
                 if (temp == null)
                 {
                     await _mongoDbService.Products.InsertOneAsync(entity);
@@ -186,7 +186,7 @@ namespace Infrastructure.Data
                                                    .Return(pro => pro.As<ProductNeo4j>().uuid)
                                                    .ResultsAsync;
 
-                var temp = result.Single();
+                var temp = result.SingleOrDefault();
                 if (temp == null)
                 {
                     await _mongoDbService.Products.ReplaceOneAsync(filter, backupProduct);
