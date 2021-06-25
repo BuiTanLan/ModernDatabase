@@ -9,21 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="37399dac-e100-46a3-80a8-e19f1729afef" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.skinet/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.skinet/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Controllers/ProductsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Controllers/ProductsController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Helpers/MappingProfiles.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Helpers/MappingProfiles.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Entities/BaseEntityMongo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Entities/BaseEntityMongo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Entities/OrderNeo4j/ProductNeo4j.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Entities/OrderNeo4j/ProductNeo4j.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Entities/Product.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Entities/Product.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Interfaces/IProductRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Interfaces/IProductRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Interfaces/IProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Interfaces/IProductService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Specifications/BaseSpecification.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Specifications/BaseSpecification.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Specifications/ProductWithFiltersForCountSpecification.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Specifications/ProductWithFiltersForCountSpecification.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Specifications/ProductsWithTypesAndBrandsSpecification.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Specifications/ProductsWithTypesAndBrandsSpecification.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/Data/MongoService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Data/MongoService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/Data/ProductRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Data/ProductRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/Data/SpecificationEvaluator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Data/SpecificationEvaluator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/Services/OrderService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Services/OrderService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/Services/ProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Services/ProductService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/app/orders/order-detailed/order-detailed.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/orders/order-detailed/order-detailed.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/app/orders/orders.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/orders/orders.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -191,6 +178,9 @@
       <workItem from="1624450998900" duration="688000" />
       <workItem from="1624451781022" duration="57000" />
       <workItem from="1624454156733" duration="9583000" />
+      <workItem from="1624500135564" duration="2450000" />
+      <workItem from="1624536179638" duration="4683000" />
+      <workItem from="1624626703804" duration="1241000" />
     </task>
     <task id="LOCAL-00001" summary="feat(): fix checkout">
       <created>1624188804509</created>
@@ -242,20 +232,20 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/API/Controllers/OrdersController.cs</url>
-          <line>42</line>
+          <line>44</line>
           <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\API\Controllers\OrdersController.cs" initialLine="42" containingFunctionPresentation="method 'GetOrderForUser'">
             <startOffsets>
-              <option value="1504" />
+              <option value="2008" />
             </startOffsets>
             <endOffsets>
-              <option value="1505" />
+              <option value="2009" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Infrastructure/Data/OrderRepository.cs</url>
-          <line>171</line>
+          <line>170</line>
           <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\Infrastructure\Data\OrderRepository.cs" initialLine="172" containingFunctionPresentation="method 'ListAsync'">
             <startOffsets>
               <option value="8722" />
@@ -267,17 +257,17 @@
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Infrastructure/Data/SpecificationEvaluator.cs</url>
-          <line>40</line>
-          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\Infrastructure\Data\SpecificationEvaluator.cs" initialLine="40" containingFunctionPresentation="method 'GetQuery'">
+          <url>file://$PROJECT_DIR$/Infrastructure/Data/OrderRepository.cs</url>
+          <line>161</line>
+          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\Infrastructure\Data\OrderRepository.cs" initialLine="161" containingFunctionPresentation="method 'GetEntityWithSpec'">
             <startOffsets>
-              <option value="1351" />
+              <option value="8378" />
             </startOffsets>
             <endOffsets>
-              <option value="1394" />
+              <option value="8405" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="13" />
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

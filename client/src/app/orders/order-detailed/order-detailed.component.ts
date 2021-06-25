@@ -17,7 +17,7 @@ export class OrderDetailedComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.ordersService.getOrderDetailed(+this.route.snapshot.paramMap.get('id'))
+    this.ordersService.getOrderDetailed(this.route.snapshot.paramMap.get('id'))
     .subscribe((order: IOrder) => {
     this.order = order;
     this.breadcrumbService.set('@OrderDetailed', `Order# ${order.id} - ${order.status}`);
