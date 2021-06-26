@@ -8,9 +8,7 @@ using Core.Entities.OrderAggregate;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Infrastructure.Data;
-using System;
-using Neo4j.Driver;
+
 using Neo4jClient;
 
 namespace API.Controllers
