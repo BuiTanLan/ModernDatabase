@@ -7,20 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="37399dac-e100-46a3-80a8-e19f1729afef" name="Default Changelist" comment="feat(): update comment">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.skinet/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.skinet/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Controllers/ProductsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Controllers/ProductsController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/Data/ProductRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Data/ProductRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/Services/CommentService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Services/CommentService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/account/account.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/account/account.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/admin/admin.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/admin/admin.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/admin/admin.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/admin/admin.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/core/interceptors/error.interceptor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/core/interceptors/error.interceptor.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/shared/components/basket-summary/basket-summary.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/shared/components/basket-summary/basket-summary.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/shared/models/order.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/shared/models/order.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/shop/product-comment/product-comment.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/shop/product-comment/product-comment.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/shop/shop.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/shop/shop.service.ts" afterDir="false" />
-    </list>
+    <list default="true" id="37399dac-e100-46a3-80a8-e19f1729afef" name="Default Changelist" comment="feat(): Update comment, admin get product" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -217,7 +204,14 @@
       <option name="project" value="LOCAL" />
       <updated>1624188804509</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="feat(): Update comment, admin get product">
+      <created>1624732066346</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1624732066346</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -241,7 +235,8 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="feat(): fix checkout" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(): fix checkout" />
+    <MESSAGE value="feat(): Update comment, admin get product" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(): Update comment, admin get product" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
