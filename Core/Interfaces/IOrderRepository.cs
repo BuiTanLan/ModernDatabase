@@ -16,6 +16,7 @@ namespace Core.Interfaces
         Task<IReadOnlyList<Order>> ListAsync(string buyerEmail);
         Task<Order> GetEntityWithSpec(ISpecification<OrderNeo4j> spec);
         Task<IReadOnlyList<DeliveryMethod>> GetDeliveryMethodsAsync();
+        Task<DeliveryMethod> GetDeliveryMethodByIdAsync(int id);
         Task<bool> CheckUserBuyProduct(string buyerEmail, string productID);
     }
 }

@@ -247,6 +247,19 @@ namespace Infrastructure.Data
             return (temp != null);
         }
 
+        public async Task<DeliveryMethod> GetDeliveryMethodByIdAsync(int id)
+        {
+            await _client.ConnectAsync();
+            if (!_client.IsConnected)
+                return null;
+
+            var result = await _client.Cypher.Match("(n:DELIVERYMETHOD)")
+                                             .Where("n.Id = $Id")
+                                             .WithParams(new { Id = id})
+                                             .Return(n => n.As<DeliveryMethod>())
+                                             .ResultsAsync;
+            return result.SingleOrDefault();
+        }
 
         private Order mappingOrder(OrderNeo4j sourceOrder,
                                   DeliveryMethod deliveryMethod,
@@ -297,7 +310,5 @@ namespace Infrastructure.Data
 
             return ret;
         }
-
-
     }
 }
