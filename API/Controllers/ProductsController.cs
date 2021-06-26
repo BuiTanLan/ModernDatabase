@@ -159,7 +159,7 @@ namespace API.Controllers
 
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Product>> DeleteProduct(string id)
         {
             var product = await _productService.GetByIdAsync(id);
