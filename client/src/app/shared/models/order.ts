@@ -10,7 +10,7 @@ export interface IOrderToCreate {
 
 
 export interface IOrderItem {
-    productId: number;
+    productId: string;
     productName: string;
     pictureUrl: string;
     price: number;
@@ -18,7 +18,7 @@ export interface IOrderItem {
 }
 
 export interface IOrder {
-    id: number;
+    id: string;
     buyerEmail: string;
     orderDate: Date;
     shipToAddress: IAddress;

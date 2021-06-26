@@ -34,7 +34,8 @@ export class ErrorInterceptor implements HttpInterceptor {
             this.router.navigateByUrl('/not-found');
           }
           if (error.status === 500) {
-            this.router.navigateByUrl('/server-error');
+            this.toastr.error("You must buy this product", "Forbidden");
+            // this.router.navigateByUrl('/server-error');
           }
         }
         return throwError(error);

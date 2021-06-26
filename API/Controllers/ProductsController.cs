@@ -34,7 +34,7 @@ namespace API.Controllers
         }
 
 
-        // [Cached(600)]
+        [Cached(600)]
         [HttpGet]
         // public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts(
         //     [FromQuery] ProductSpecParams productParams)
@@ -52,7 +52,7 @@ namespace API.Controllers
         //     productParams.PageSize, totalItems, data));
         // }
 
-        //[HttpGet()]
+        [HttpGet]
         public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetAllProductAsync([FromQuery] ProductSpecParams param)
         {
             var result = await _productService.GetAllProductAsync(param);
@@ -61,9 +61,20 @@ namespace API.Controllers
                  return Ok(new Pagination<ProductToReturnDto>(param.PageIndex,
                 param.PageSize, result.Item2, data));
         }
+        
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin")]
+        public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetAllProductForAdminAsync([FromQuery] ProductSpecParams param)
+        {
+            var result = await _productService.GetAllProductAsync(param);
+            var data = _mapper
+                .Map<List<Product>, List<ProductToReturnDto>>(result.Item1);
+            return Ok(new Pagination<ProductToReturnDto>(param.PageIndex,
+                param.PageSize, result.Item2, data));
+        }
 
 
-       // [Cached(600)]
+        [Cached(600)]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)] 
@@ -78,7 +89,7 @@ namespace API.Controllers
         }
 
 
-        //[Cached(600)]
+        [Cached(600)]
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
         {
@@ -87,14 +98,14 @@ namespace API.Controllers
         }
 
 
-        //[Cached(600)]
+        [Cached(600)]
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<ProductType>>> GetProductTypes()
         {
             return Ok(await _productService.GetProductTypesAsync());
         }
 
-        //[Cached(600)]
+        [Cached(600)]
         [HttpGet("recommend/{id}")]
         public async Task<ActionResult<List<Product>>> GetRecommendProducts(string id)
         {

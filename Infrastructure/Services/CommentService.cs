@@ -19,7 +19,7 @@ namespace Infrastructure.Services
 
         public async Task<Comment> AddComment(Comment comment)
         {
-            if (await _orderRepo.CheckUserBuyProduct(comment.UserName, comment.ProductId))
+            if (await _orderRepo.CheckUserBuyProduct(comment.Email, comment.ProductId))
             {
                 return await _commentRepo.Add(comment);
             }

@@ -99,7 +99,7 @@ namespace Infrastructure.Data
             {
                 var filter = Builders<Product>.Filter.Eq(e => e.Id, entity.Id);
                 await _mongoDbService.Products.DeleteOneAsync(filter);
-                return;
+                return;     
             }
 
 
