@@ -175,7 +175,7 @@ namespace API.Controllers
             {
                 await _productService.Delete(product);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return BadRequest(new ApiResponse(400, "Problem deleting product"));
             }
