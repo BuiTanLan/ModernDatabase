@@ -7,7 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="37399dac-e100-46a3-80a8-e19f1729afef" name="Default Changelist" comment="feat(): Update comment, admin get product" />
+    <list default="true" id="37399dac-e100-46a3-80a8-e19f1729afef" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.skinet/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.skinet/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Infrastructure/Services/OrderService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Services/OrderService.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -75,7 +78,6 @@
       <option value="$PROJECT_DIR$/Core/Entities/CommentCassandra/Comment.cs" />
       <option value="$PROJECT_DIR$/Infrastructure/Data/CommentRepository.cs" />
       <option value="$PROJECT_DIR$/Core/Interfaces/IOrderRepository.cs" />
-      <option value="$PROJECT_DIR$/Infrastructure/Services/OrderService.cs" />
       <option value="$PROJECT_DIR$/Core/Entities/BaseEntityNeo4j.cs" />
       <option value="$PROJECT_DIR$/Core/Entities/OrderNeo4j/OrderNeo4j.cs" />
       <option value="$PROJECT_DIR$/Core/Specifications/BaseSpecification.cs" />
@@ -105,6 +107,7 @@
       <option value="$PROJECT_DIR$/client/src/app/core/interceptors/error.interceptor.ts" />
       <option value="$PROJECT_DIR$/client/src/app/shop/product-comment/product-comment.component.ts" />
       <option value="$PROJECT_DIR$/Infrastructure/Data/OrderRepository.cs" />
+      <option value="$PROJECT_DIR$/Infrastructure/Services/OrderService.cs" />
     </changedPaths>
   </component>
   <component name="ProjectId" id="1sOQWvlq29EQh6KL4DynhMQB8Bo" />
@@ -341,7 +344,6 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/client/src/app/shop/shop.service.ts</url>
           <line>89</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="16" />
         </line-breakpoint>
       </breakpoints>
