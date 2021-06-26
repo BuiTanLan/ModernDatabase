@@ -123,10 +123,9 @@ namespace Infrastructure.Data
 
             try
             {
-                var result = await _client.Cypher.Match("(pro:PRODUCT)<-[r:BUY]-()")
+                var result = await _client.Cypher.Match("(pro:PRODUCT)")
                        .Where("pro.ProductItemId = $id")
                        .Set("pro.IsDeleted = 1")
-                       .Delete("r")
                        .WithParams(new { id = entity.Id })
                        .Return(pro => pro.As<ProductNeo4j>().uuid)
                        .ResultsAsync;
@@ -138,9 +137,25 @@ namespace Infrastructure.Data
                     return;
                 }
 
+                await _client.Cypher.Match("(pro:PRODUCT)<-[r:BUY]-()")
+                                    .Where("pro.ProductItemId = $id")
+                                    .Delete("r")
+                                    .WithParams(new { id = entity.Id })
+                                    .ExecuteWithoutResultsAsync();
+
+                //temp = result2.SingleOrDefault();
+                //if (temp == null)
+                //{
+                //    await _mongoDbService.Products.InsertOneAsync(entity);
+                //    await _client.Cypher.Match("(pro:PRODUCT)")
+                //       .Where("pro.ProductItemId = $id")
+                //       .Set("pro.IsDeleted = 0")
+                //       .WithParams(new { id = entity.Id })
+                //       .ExecuteWithoutResultsAsync();
+                //}
                 //try
                 //{
-                    await _commentRepository.DeleteMany(entity.Id);
+                //await _commentRepository.DeleteMany(entity.Id);
                 //}
             }
             catch (Exception ex)
