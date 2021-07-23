@@ -34,6 +34,16 @@ namespace API.Controllers
         }
 
 
+        [HttpGet("product-admin")]
+        public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetAllProductAdminAsync([FromQuery] ProductSpecParams param)
+        {
+            var result = await _productService.GetAllProductAsync(param);
+            var data = _mapper
+                     .Map<List<Product>, List<ProductToReturnDto>>(result.Item1);
+            return Ok(new Pagination<ProductToReturnDto>(param.PageIndex,
+           param.PageSize, result.Item2, data));
+        }
+
         [Cached(600)]
         [HttpGet]
         // public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts(
