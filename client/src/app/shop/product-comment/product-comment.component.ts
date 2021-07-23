@@ -46,23 +46,9 @@ export class ProductCommentComponent implements OnInit {
         displayTime: this.formatDate(comment.commentAt),
         avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
       }];
+    }, error => {
+      this.submitting = false;
     });
-    // setTimeout(() => {
-    //   this.data = [
-    //     ...this.data,
-    //     {
-    //       ...this.user,
-    //       content,
-    //       datetime: new Date(),
-    //       displayTime: Date.now().toString()
-    //     }
-    //   ].map(e => {
-    //     return {
-    //       ...e,
-    //       displayTime: Date()
-    //     };
-    //   });
-    // }, 800);
   }
   ngOnInit(): void {
     this.accountService.currentUser$.subscribe(user =>

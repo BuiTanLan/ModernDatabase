@@ -66,7 +66,7 @@ namespace Infrastructure.Services
             //create order 
             var order = new Order(items, buyerEmail, shippingAddress, deliveryMethod, subtotal);
             // var order = new Order();
-            order.Total = subtotal;//+ order.DeliveryMethod.Price;
+            order.Total = subtotal+ order.DeliveryMethod.Price;
 
             await _orderRepository.Add(order);
             //_unitOfWork.Repository<Order>().Add(order);

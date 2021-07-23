@@ -20,7 +20,6 @@ export class ShopService {
   types: IType[] = [];
   pagination = new Pagination();
   shopParams = new ShopParams();
-  productCache = new Map();
 
   constructor(private http: HttpClient) {}
 
@@ -56,16 +55,6 @@ export class ShopService {
 
 
   getProduct(id: string) {
-    let product: IProduct;
-    this.productCache.forEach((products: IProduct[]) => {
-      console.log(product);
-      product = products.find(p => p.id === id);
-    });
-
-    if (product) {
-      return of(product);
-    }
-
     return this.http.get<IProduct>(this.baseUrl + 'products/' + id);
   }
 
@@ -91,7 +80,6 @@ export class ShopService {
       })
       .pipe(
         map((response) => {
-          this.productCache.set(Object.values(this.shopParams).join('-'), response.body.data);
           this.pagination = response.body;
           return this.pagination;
         })

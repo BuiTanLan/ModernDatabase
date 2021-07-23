@@ -1,11 +1,11 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { BehaviorSubject, of, ReplaySubject } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { environment } from 'src/environments/environment';
-import { IAddress } from '../shared/models/address';
-import { IUser } from '../shared/models/user';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {Router} from '@angular/router';
+import {BehaviorSubject, of, ReplaySubject} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {environment} from 'src/environments/environment';
+import {IAddress} from '../shared/models/address';
+import {IUser} from '../shared/models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class AccountService {
   baseUrl = environment.apiUrl;
   private currentUserSource = new ReplaySubject<IUser>(1);
   currentUser$ = this.currentUserSource.asObservable();
-  private isAdminSource = new ReplaySubject<boolean>(1);
+  private isAdminSource = new BehaviorSubject<boolean>(false);
   isAdmin$ = this.isAdminSource.asObservable();
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -48,6 +48,7 @@ export class AccountService {
           localStorage.setItem('token', user.token);
           this.currentUserSource.next(user);
           this.isAdminSource.next(this.isAdmin(user.token));
+          this.router.navigateByUrl('/');
 
         }
       })
@@ -91,9 +92,10 @@ export class AccountService {
   isAdmin(token: string): boolean {
     if (token) {
       const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      if (decodedToken.role.indexOf('Admin') > -1) {
-        return true;
-      }
+      return decodedToken?.role?.indexOf('Admin') > -1 ?? false;
+    }
+    else {
+      return false;
     }
   }
 }

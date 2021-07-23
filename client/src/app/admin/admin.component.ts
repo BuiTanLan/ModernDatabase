@@ -15,14 +15,14 @@ export class AdminComponent implements OnInit {
   shopParams: ShopParams;
 
   constructor(private shopService: ShopService, private adminService: AdminService) {
-    this.shopParams = this.shopService.getShopParams();
+    this.shopParams = this.adminService.getShopParams();
   }
 
   ngOnInit(): void {
     this.getProducts();
   }
   getProducts() {
-    this.shopService.getProducts().subscribe(response => {
+    this.adminService.getProducts().subscribe(response => {
       this.products = response.data;
       this.totalCount = response.count;
     }, error => {
@@ -31,10 +31,10 @@ export class AdminComponent implements OnInit {
   }
 
   onPageChanged(event: any) {
-    const params = this.shopService.getShopParams();
+    const params = this.adminService.getShopParams();
     if (params.pageNumber !== event) {
       params.pageNumber = event;
-      this.shopService.setShopParams(params);
+      this.adminService.setShopParams(params);
       this.getProducts();
     }
   }

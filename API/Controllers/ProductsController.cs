@@ -62,13 +62,24 @@ namespace API.Controllers
         //     productParams.PageSize, totalItems, data));
         // }
 
-        [HttpGet()]
+        [HttpGet]
         public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetAllProductAsync([FromQuery] ProductSpecParams param)
         {
             var result = await _productService.GetAllProductAsync(param);
             var data = _mapper
                      .Map<List<Product>, List<ProductToReturnDto>>(result.Item1);
                  return Ok(new Pagination<ProductToReturnDto>(param.PageIndex,
+                param.PageSize, result.Item2, data));
+        }
+        
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin")]
+        public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetAllProductForAdminAsync([FromQuery] ProductSpecParams param)
+        {
+            var result = await _productService.GetAllProductAsync(param);
+            var data = _mapper
+                .Map<List<Product>, List<ProductToReturnDto>>(result.Item1);
+            return Ok(new Pagination<ProductToReturnDto>(param.PageIndex,
                 param.PageSize, result.Item2, data));
         }
 

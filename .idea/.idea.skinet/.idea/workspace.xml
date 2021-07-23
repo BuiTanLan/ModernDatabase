@@ -9,8 +9,7 @@
   <component name="ChangeListManager">
     <list default="true" id="37399dac-e100-46a3-80a8-e19f1729afef" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.skinet/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.skinet/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/orders/order-detailed/order-detailed.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/orders/order-detailed/order-detailed.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/app/orders/orders.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/app/orders/orders.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Infrastructure/Services/OrderService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Services/OrderService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +48,16 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock://C:/Users/tanlan/Desktop/ModernDatabase/API/Controllers/ProductsController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/tanlan/Desktop/ModernDatabase/Infrastructure/Data/ProductRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/tanlan/Desktop/ModernDatabase/API/Controllers/CommentController.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/07DFB1EA-008B-4715-8970-C250EA4475FC/38/ControllerBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/tanlan/Desktop/ModernDatabase/API/Controllers/OrdersController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/tanlan/Desktop/ModernDatabase/API/Controllers/ProductsController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/tanlan/Desktop/ModernDatabase/Infrastructure/Services/CommentService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/tanlan/Desktop/ModernDatabase/API/Controllers/ProductsController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/tanlan/Desktop/ModernDatabase/Infrastructure/Data/ProductRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/tanlan/Desktop/ModernDatabase/API/Controllers/ProductsController.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <changedPaths>
@@ -66,16 +74,12 @@
       <option value="$PROJECT_DIR$/Infrastructure/Services/PaymentService.cs" />
       <option value="$PROJECT_DIR$/Core/Specifications/OrdersWithItemsAndOrderingSpecification.cs" />
       <option value="$PROJECT_DIR$/API/Dtos/CommentRequestDto.cs" />
-      <option value="$PROJECT_DIR$/Infrastructure/Services/CommentService.cs" />
-      <option value="$PROJECT_DIR$/API/Controllers/CommentController.cs" />
       <option value="$PROJECT_DIR$/API/appsettings.Development.json" />
       <option value="$PROJECT_DIR$/Core/Entities/CommentCassandra/Comment.cs" />
       <option value="$PROJECT_DIR$/Infrastructure/Data/CommentRepository.cs" />
       <option value="$PROJECT_DIR$/Core/Interfaces/IOrderRepository.cs" />
-      <option value="$PROJECT_DIR$/Infrastructure/Services/OrderService.cs" />
       <option value="$PROJECT_DIR$/Core/Entities/BaseEntityNeo4j.cs" />
       <option value="$PROJECT_DIR$/Core/Entities/OrderNeo4j/OrderNeo4j.cs" />
-      <option value="$PROJECT_DIR$/Infrastructure/Data/OrderRepository.cs" />
       <option value="$PROJECT_DIR$/Core/Specifications/BaseSpecification.cs" />
       <option value="$PROJECT_DIR$/Core/Specifications/ProductsWithTypesAndBrandsSpecification.cs" />
       <option value="$PROJECT_DIR$/Core/Specifications/ProductWithFiltersForCountSpecification.cs" />
@@ -83,13 +87,27 @@
       <option value="$PROJECT_DIR$/Infrastructure/Data/MongoService.cs" />
       <option value="$PROJECT_DIR$/Core/Interfaces/IProductRepository.cs" />
       <option value="$PROJECT_DIR$/Core/Entities/BaseEntityMongo.cs" />
-      <option value="$PROJECT_DIR$/Infrastructure/Data/ProductRepository.cs" />
       <option value="$PROJECT_DIR$/Infrastructure/Services/ProductService.cs" />
-      <option value="$PROJECT_DIR$/API/Controllers/ProductsController.cs" />
       <option value="$PROJECT_DIR$/Core/Interfaces/IProductService.cs" />
       <option value="$PROJECT_DIR$/Core/Entities/OrderNeo4j/ProductNeo4j.cs" />
       <option value="$PROJECT_DIR$/API/Helpers/MappingProfiles.cs" />
       <option value="$PROJECT_DIR$/Core/Entities/Product.cs" />
+      <option value="$PROJECT_DIR$/API/Controllers/OrdersController.cs" />
+      <option value="$PROJECT_DIR$/client/src/app/admin/edit-product/edit-product.component.scss" />
+      <option value="$PROJECT_DIR$/client/src/app/shop/shop.service.ts" />
+      <option value="$PROJECT_DIR$/client/src/app/account/account.service.ts" />
+      <option value="$PROJECT_DIR$/API/Controllers/ProductsController.cs" />
+      <option value="$PROJECT_DIR$/client/src/app/admin/admin.component.ts" />
+      <option value="$PROJECT_DIR$/Infrastructure/Data/ProductRepository.cs" />
+      <option value="$PROJECT_DIR$/client/src/app/admin/admin.service.ts" />
+      <option value="$PROJECT_DIR$/client/src/app/shared/components/basket-summary/basket-summary.component.html" />
+      <option value="$PROJECT_DIR$/client/src/app/shared/models/order.ts" />
+      <option value="$PROJECT_DIR$/Infrastructure/Services/CommentService.cs" />
+      <option value="$PROJECT_DIR$/API/Controllers/CommentController.cs" />
+      <option value="$PROJECT_DIR$/client/src/app/core/interceptors/error.interceptor.ts" />
+      <option value="$PROJECT_DIR$/client/src/app/shop/product-comment/product-comment.component.ts" />
+      <option value="$PROJECT_DIR$/Infrastructure/Data/OrderRepository.cs" />
+      <option value="$PROJECT_DIR$/Infrastructure/Services/OrderService.cs" />
     </changedPaths>
   </component>
   <component name="ProjectId" id="1sOQWvlq29EQh6KL4DynhMQB8Bo" />
@@ -111,8 +129,8 @@
     <property name="app.teamhub.trackedBranches" value="3c6qi5/lanbt/comment,3c6qi5/master" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
-    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\JetBrains Rider 2021.1\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
+    <property name="settings.editor.selected.configurable" value="watcher.settings" />
+    <property name="ts.external.directory.path" value="C:\Users\tanlan\Desktop\ModernDatabase\client\node_modules\typescript\lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager" selected=".NET Launch Settings Profile.API">
@@ -189,7 +207,14 @@
       <option name="project" value="LOCAL" />
       <updated>1624188804509</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="feat(): Update comment, admin get product">
+      <created>1624732066346</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1624732066346</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -213,7 +238,8 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="feat(): fix checkout" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(): fix checkout" />
+    <MESSAGE value="feat(): Update comment, admin get product" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(): Update comment, admin get product" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -225,49 +251,100 @@
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Infrastructure/Services/OrderService.cs</url>
-          <line>156</line>
-          <properties documentPath="C:\Users\TMT\RiderProjects\ModernDatabase\Infrastructure\Services\OrderService.cs" initialLine="156" containingFunctionPresentation="method 'GetOrdersForUserAsync'" />
-          <option name="timeStamp" value="2" />
+          <url>file://$PROJECT_DIR$/Infrastructure/Data/ProductRepository.cs</url>
+          <line>115</line>
+          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\Infrastructure\Data\ProductRepository.cs" initialLine="115" containingFunctionPresentation="method 'Delete'">
+            <startOffsets>
+              <option value="4233" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4234" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Infrastructure/Data/ProductRepository.cs</url>
+          <line>132</line>
+          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\Infrastructure\Data\ProductRepository.cs" initialLine="132" containingFunctionPresentation="method 'Delete'">
+            <startOffsets>
+              <option value="4890" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4926" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Infrastructure/Data/OrderRepository.cs</url>
+          <line>147</line>
+          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\Infrastructure\Data\OrderRepository.cs" initialLine="147" containingFunctionPresentation="method 'GetEntityWithSpec'">
+            <startOffsets>
+              <option value="7381" />
+            </startOffsets>
+            <endOffsets>
+              <option value="7382" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/API/Controllers/OrdersController.cs</url>
-          <line>44</line>
-          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\API\Controllers\OrdersController.cs" initialLine="42" containingFunctionPresentation="method 'GetOrderForUser'">
+          <line>31</line>
+          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\API\Controllers\OrdersController.cs" initialLine="31" containingFunctionPresentation="method 'CreateOrder'">
             <startOffsets>
-              <option value="2008" />
+              <option value="902" />
             </startOffsets>
             <endOffsets>
-              <option value="2009" />
+              <option value="960" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="5" />
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Infrastructure/Services/OrderService.cs</url>
+          <line>36</line>
+          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\Infrastructure\Services\OrderService.cs" initialLine="36" containingFunctionPresentation="method 'CreateOrderAsync'">
+            <startOffsets>
+              <option value="1334" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1390" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="21" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Infrastructure/Data/OrderRepository.cs</url>
-          <line>170</line>
-          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\Infrastructure\Data\OrderRepository.cs" initialLine="172" containingFunctionPresentation="method 'ListAsync'">
+          <line>23</line>
+          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\Infrastructure\Data\OrderRepository.cs" initialLine="23" containingFunctionPresentation="method 'Add'">
             <startOffsets>
-              <option value="8722" />
+              <option value="601" />
             </startOffsets>
             <endOffsets>
-              <option value="8751" />
+              <option value="602" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="8" />
+          <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Infrastructure/Data/OrderRepository.cs</url>
-          <line>161</line>
-          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\Infrastructure\Data\OrderRepository.cs" initialLine="161" containingFunctionPresentation="method 'GetEntityWithSpec'">
+          <url>file://$PROJECT_DIR$/Infrastructure/Services/OrderService.cs</url>
+          <line>48</line>
+          <properties documentPath="C:\Users\tanlan\Desktop\ModernDatabase\Infrastructure\Services\OrderService.cs" initialLine="48" containingFunctionPresentation="method 'CreateOrderAsync'">
             <startOffsets>
-              <option value="8378" />
+              <option value="2026" />
             </startOffsets>
             <endOffsets>
-              <option value="8405" />
+              <option value="2027" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="9" />
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/client/src/app/shop/shop.service.ts</url>
+          <line>89</line>
+          <option name="timeStamp" value="16" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -276,5 +353,9 @@
         <PinnedItemInfo parentTag="Type#Core.Entities.CustomerBasket" memberName="Items" />
       </pinned-members>
     </pin-to-top-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

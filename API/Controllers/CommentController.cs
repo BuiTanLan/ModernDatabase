@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    public class CommentController : BaseApiController
+    public class  CommentController : BaseApiController
     {
         private readonly ICommentService _commentService;
         private readonly UserManager<AppUser> _userManager;
